@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -9,6 +10,9 @@ use Laravel\Fortify\Http\Controllers\ConfirmablePasswordController;
 use App\Http\Controllers\CountryController;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
     return Inertia::render('Welcome');
 });
 

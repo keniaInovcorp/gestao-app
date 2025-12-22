@@ -1,6 +1,7 @@
 <template>
-    <Head title="Criar País" />
-    <div class="p-6">
+    <AuthenticatedLayout>
+        <Head title="Criar País" />
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="mb-6">
             <Link href="/countries" class="text-blue-600 hover:text-blue-900 mb-4 inline-block">
                 ← Voltar
@@ -66,12 +67,14 @@
                 </div>
             </form>
         </div>
-    </div>
+        </div>
+    </AuthenticatedLayout>
 </template>
 
 <script setup>
 import { Head, Link, router, useForm as useInertiaForm } from '@inertiajs/vue3';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'vee-validate';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
