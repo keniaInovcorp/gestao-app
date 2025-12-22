@@ -10,9 +10,10 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "inertiajs/inertia-laravel": "^1.0",
-        "laravel/fortify": "^2.0",
+        "laravel/fortify": "^2.0@dev",
         "spatie/laravel-permission": "^6.0",
-        "spatie/laravel-activitylog": "^4.8"
+        "spatie/laravel-activitylog": "^4.8",
+        "barryvdh/laravel-dompdf": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -83,7 +84,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        }
+        },
+        "cafile": "C:\\Users\\kenia\\.composer\\cacert.pem",
+        "secure-http": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true
