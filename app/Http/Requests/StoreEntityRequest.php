@@ -40,4 +40,28 @@ class StoreEntityRequest extends FormRequest
             'status' => ['required', 'in:active,inactive'],
         ];
     }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'tax_number.unique' => 'Este NIF já está registado.',
+            'tax_number.required' => 'O NIF é obrigatório.',
+            'name.required' => 'O nome é obrigatório.',
+            'address.required' => 'A morada é obrigatória.',
+            'postal_code.required' => 'O código postal é obrigatório.',
+            'postal_code.regex' => 'O formato do código postal é inválido (XXXX-XXX).',
+            'city.required' => 'A localidade é obrigatória.',
+            'country_id.required' => 'O país é obrigatório.',
+            'country_id.exists' => 'O país selecionado é inválido.',
+            'website.url' => 'O formato do website é inválido.',
+            'email.email' => 'O formato do email é inválido.',
+            'status.required' => 'O estado é obrigatório.',
+            'status.in' => 'O estado selecionado é inválido.',
+        ];
+    }
 }

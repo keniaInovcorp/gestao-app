@@ -10,8 +10,10 @@
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
-                <form @submit.prevent="onSubmit">
-                    <input type="hidden" v-model="inertiaForm.type" />
+                <form @submit="onSubmit">
+                    <FormField v-slot="{ componentField }" name="type">
+                        <input type="hidden" v-bind="componentField" />
+                    </FormField>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <FormField v-slot="{ componentField }" name="tax_number">
@@ -272,7 +274,7 @@ const schema = toTypedSchema(z.object({
     status: z.enum(['active', 'inactive']),
 }));
 
-const { handleSubmit, setValues, getValues } = useForm({
+const { handleSubmit, setValues, getValues, setFieldError } = useForm({
     validationSchema: schema,
     initialValues: {
         type: props.type || 'client',
@@ -293,7 +295,7 @@ const { handleSubmit, setValues, getValues } = useForm({
 });
 
 const inertiaForm = useInertiaForm({
-    type: props.type || 'cliente',
+    type: props.type || 'client',
     tax_number: '',
     name: '',
     address: '',
@@ -417,7 +419,13 @@ const onSubmit = handleSubmit((values) => {
     inertiaForm.gdpr_consent = values.gdpr_consent || false;
     inertiaForm.notes = values.notes || '';
     inertiaForm.status = values.status;
-
-    inertiaForm.post('/entities');
+    
+    inertiaForm.post('/entities', {
+        onError: (errors) => {
+            Object.keys(errors).forEach((field) => {
+                setFieldError(field, errors[field]);
+            });
+        },
+    });
 });
 </script>
