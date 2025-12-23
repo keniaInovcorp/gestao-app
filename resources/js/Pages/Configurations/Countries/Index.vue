@@ -21,8 +21,8 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-if="countries.data.length > 0" v-for="country in countries.data" :key="country.id">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ country.code }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ country.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(country.code) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(country.name) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span :class="country.status === 'active' ? 'text-green-600' : 'text-red-600'">
                                 {{ country.status === 'active' ? 'Ativo' : 'Inativo' }}
@@ -50,6 +50,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     countries: {

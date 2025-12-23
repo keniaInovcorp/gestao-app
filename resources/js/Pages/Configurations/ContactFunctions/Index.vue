@@ -20,7 +20,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-if="contactFunctions.data.length > 0" v-for="contactFunction in contactFunctions.data" :key="contactFunction.id">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contactFunction.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contactFunction.name) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span :class="contactFunction.status === 'active' ? 'text-green-600' : 'text-red-600'">
                                 {{ contactFunction.status === 'active' ? 'Ativo' : 'Inativo' }}
@@ -48,6 +48,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     contactFunctions: {

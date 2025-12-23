@@ -25,13 +25,13 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="contacts.data.length > 0" v-for="contact in contacts.data" :key="contact.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.first_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.last_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.contact_function?.name || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.entity?.name || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.phone || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.mobile || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ contact.email || '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.first_name) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.last_name) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.contact_function?.name || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.entity?.name || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.phone || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.mobile || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(contact.email || '-') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <Link :href="`/contacts/${contact.id}/edit`" class="text-blue-600 hover:text-blue-900">Editar</Link>
                             </td>
@@ -54,6 +54,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     contacts: {

@@ -24,12 +24,12 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="entities.data.length > 0" v-for="entity in entities.data" :key="entity.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.tax_number }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.phone || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.mobile || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.website || '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ entity.email || '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.tax_number) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.name) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.phone || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.mobile || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.website || '-') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.email || '-') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <Link :href="`/entities/${entity.id}/edit`" class="text-blue-600 hover:text-blue-900">Editar</Link>
                             </td>
@@ -52,6 +52,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     entities: {

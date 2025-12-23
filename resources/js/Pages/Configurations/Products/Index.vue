@@ -23,7 +23,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-if="products.data.length > 0" v-for="product in products.data" :key="product.id">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ product.reference }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(product.reference) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <img 
                                 v-if="product.photo" 
@@ -33,9 +33,9 @@
                             />
                             <span v-else class="text-gray-400">-</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ product.name }}</td>
-                        <td class="px-6 py-4 text-sm">{{ product.description || '-' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ formatPrice(product.price) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(product.name) }}</td>
+                        <td class="px-6 py-4 text-sm">{{ truncate(product.description || '-') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(formatPrice(product.price)) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <Link :href="`/products/${product.id}/edit`" class="text-blue-600 hover:text-blue-900">Editar</Link>
                         </td>
@@ -58,6 +58,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     products: {

@@ -21,8 +21,8 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-if="vatRates.data.length > 0" v-for="vatRate in vatRates.data" :key="vatRate.id">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ vatRate.name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ vatRate.percentage }}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(vatRate.name) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(String(vatRate.percentage) + '%') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span :class="vatRate.status === 'active' ? 'text-green-600' : 'text-red-600'">
                                 {{ vatRate.status === 'active' ? 'Ativo' : 'Inativo' }}
@@ -50,6 +50,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { truncate } from '@/utils/truncate';
 
 const props = defineProps({
     vatRates: {
