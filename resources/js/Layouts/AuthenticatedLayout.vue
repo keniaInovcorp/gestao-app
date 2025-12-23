@@ -31,6 +31,13 @@
                             >
                                 Fornecedores
                             </Link>
+                            <Link
+                                href="/contacts"
+                                class="px-3 py-2 rounded-md text-sm font-medium transition"
+                                :class="$page.url.startsWith('/contacts') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                            >
+                                Contactos
+                            </Link>
                             <div class="relative group">
                                 <button class="px-3 py-2 rounded-md text-sm font-medium transition flex items-center"
                                     :class="$page.url.startsWith('/countries') || $page.url.startsWith('/contact-functions') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'">
