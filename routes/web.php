@@ -9,6 +9,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticatedSessionController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ContactFunctionController;
+use App\Http\Controllers\VatRateController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EntityController;
 
@@ -36,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('countries', CountryController::class);
     Route::resource('contact-functions', ContactFunctionController::class);
+    Route::resource('vat-rates', VatRateController::class);
     Route::resource('contacts', ContactController::class);
 
     Route::get('/clients', function (Request $request) {
