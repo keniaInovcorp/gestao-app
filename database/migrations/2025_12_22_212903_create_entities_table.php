@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('entities', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->string('number')->unique();
-            $table->string('tax_number')->unique();
+            $table->string('number');
+            $table->string('tax_number');
             $table->string('name');
             $table->text('address');
             $table->string('postal_code', 8);
@@ -31,6 +31,9 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
+            
+            $table->unique(['type', 'number']);
+            $table->unique(['type', 'tax_number']);
         });
     }
 

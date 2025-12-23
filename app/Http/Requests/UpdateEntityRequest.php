@@ -26,7 +26,15 @@ class UpdateEntityRequest extends FormRequest
     {
         return [
             'type' => ['required', 'in:client,supplier'],
-            'tax_number' => ['required', 'string', Rule::unique('entities')->ignore($this->entity)],
+            'tax_number' => [
+                'required',
+                'string',
+                Rule::unique('entities')
+                    ->where(function ($query) {
+                        return $query->where('type', $this->type);
+                    })
+                    ->ignore($this->entity),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string'],
             'postal_code' => ['required', 'regex:/^\d{4}-\d{3}$/'],
@@ -36,7 +44,6 @@ class UpdateEntityRequest extends FormRequest
             'mobile' => ['nullable', 'string'],
             'website' => ['nullable', 'url'],
             'email' => ['nullable', 'email'],
-            'gdpr_consent' => ['boolean'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ];
@@ -50,7 +57,7 @@ class UpdateEntityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'tax_number.unique' => 'Este NIF já está registado.',
+            'tax_number.unique' => 'Este NIF já está registado como ' . ($this->type === 'client' ? 'cliente' : 'fornecedor') . '.',
             'tax_number.required' => 'O NIF é obrigatório.',
             'name.required' => 'O nome é obrigatório.',
             'address.required' => 'A morada é obrigatória.',

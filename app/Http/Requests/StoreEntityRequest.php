@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreEntityRequest extends FormRequest
 {
@@ -25,7 +26,13 @@ class StoreEntityRequest extends FormRequest
     {
         return [
             'type' => ['required', 'in:client,supplier'],
-            'tax_number' => ['required', 'string', 'unique:entities,tax_number'],
+            'tax_number' => [
+                'required',
+                'string',
+                Rule::unique('entities')->where(function ($query) {
+                    return $query->where('type', $this->type);
+                }),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string'],
             'postal_code' => ['required', 'regex:/^\d{4}-\d{3}$/'],
@@ -35,7 +42,7 @@ class StoreEntityRequest extends FormRequest
             'mobile' => ['nullable', 'string'],
             'website' => ['nullable', 'url'],
             'email' => ['nullable', 'email'],
-            'gdpr_consent' => ['boolean'],
+            'gdpr_consent' => ['required', 'boolean', 'accepted'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ];
@@ -49,7 +56,7 @@ class StoreEntityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'tax_number.unique' => 'Este NIF já está registado.',
+            'tax_number.unique' => 'Este NIF já está registado como ' . ($this->type === 'client' ? 'cliente' : 'fornecedor') . '.',
             'tax_number.required' => 'O NIF é obrigatório.',
             'name.required' => 'O nome é obrigatório.',
             'address.required' => 'A morada é obrigatória.',
@@ -60,6 +67,8 @@ class StoreEntityRequest extends FormRequest
             'country_id.exists' => 'O país selecionado é inválido.',
             'website.url' => 'O formato do website é inválido.',
             'email.email' => 'O formato do email é inválido.',
+            'gdpr_consent.required' => 'É obrigatório aceitar o consentimento RGPD.',
+            'gdpr_consent.accepted' => 'É obrigatório aceitar o consentimento RGPD.',
             'status.required' => 'O estado é obrigatório.',
             'status.in' => 'O estado selecionado é inválido.',
         ];

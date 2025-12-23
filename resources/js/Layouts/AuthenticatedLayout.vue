@@ -20,9 +20,16 @@
                             <Link
                                 href="/clients"
                                 class="px-3 py-2 rounded-md text-sm font-medium transition"
-                                :class="$page.url.startsWith('/clients') || $page.url.startsWith('/entities') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                                :class="$page.url.startsWith('/clients') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'"
                             >
                                 Clientes
+                            </Link>
+                            <Link
+                                href="/suppliers"
+                                class="px-3 py-2 rounded-md text-sm font-medium transition"
+                                :class="$page.url.startsWith('/suppliers') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                            >
+                                Fornecedores
                             </Link>
                             <div class="relative group">
                                 <button class="px-3 py-2 rounded-md text-sm font-medium transition flex items-center"

@@ -42,6 +42,14 @@ Route::middleware(['auth'])->group(function () {
         return app(EntityController::class)->create($request->merge(['type' => 'client']));
     })->name('clients.create');
 
+    Route::get('/suppliers', function (Request $request) {
+        return app(EntityController::class)->index($request->merge(['type' => 'supplier']));
+    })->name('suppliers.index');
+    
+    Route::get('/suppliers/create', function (Request $request) {
+        return app(EntityController::class)->create($request->merge(['type' => 'supplier']));
+    })->name('suppliers.create');
+
     Route::post('/entities', [EntityController::class, 'store'])->name('entities.store');
     Route::get('/entities/{entity}', [EntityController::class, 'show'])->name('entities.show');
     Route::get('/entities/{entity}/edit', [EntityController::class, 'edit'])->name('entities.edit');

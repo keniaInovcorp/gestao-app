@@ -127,7 +127,10 @@ class EntityController extends Controller
      */
     public function update(UpdateEntityRequest $request, Entity $entity)
     {
-        $entity->update($request->validated());
+        $data = $request->validated();
+        unset($data['gdpr_consent']);
+        
+        $entity->update($data);
 
         $routeName = $entity->type === 'client' ? 'clients.index' : 'suppliers.index';
         return redirect()->route($routeName)

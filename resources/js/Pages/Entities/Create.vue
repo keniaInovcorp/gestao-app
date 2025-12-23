@@ -164,25 +164,6 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="gdpr_consent" class="md:col-span-2">
-                            <FormItem class="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        v-bind="componentField"
-                                        :checked="componentField.value"
-                                    />
-                                </FormControl>
-                                <div class="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Consentimento RGPD
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Autoriza o tratamento dos dados pessoais
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        </FormField>
-
                         <FormField v-slot="{ componentField }" name="notes" class="md:col-span-2">
                             <FormItem>
                                 <FormLabel>Observações</FormLabel>
@@ -197,7 +178,7 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="status">
+                        <FormField v-slot="{ componentField }" name="status" class="md:col-span-2">
                             <FormItem class="space-y-2">
                                 <FormLabel>Estado</FormLabel>
                                 <Select v-bind="componentField">
@@ -209,6 +190,26 @@
                                         <SelectItem value="inactive">Inativo</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+
+                        <FormField v-slot="{ componentField }" name="gdpr_consent" class="md:col-span-2">
+                            <FormItem class="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                    <Checkbox
+                                        :model-value="componentField.value"
+                                        @update:model-value="componentField.onChange"
+                                    />
+                                </FormControl>
+                                <div class="space-y-1 leading-none">
+                                    <FormLabel>
+                                        Consentimento RGPD
+                                    </FormLabel>
+                                    <FormDescription>
+                                        Autoriza o tratamento dos dados pessoais
+                                    </FormDescription>
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         </FormField>
@@ -269,7 +270,9 @@ const schema = toTypedSchema(z.object({
     mobile: z.string().optional(),
     website: z.string().refine((val) => !val || z.string().url().safeParse(val).success, { message: 'URL inválida' }).optional(),
     email: z.string().refine((val) => !val || z.string().email().safeParse(val).success, { message: 'Email inválido' }).optional(),
-    gdpr_consent: z.boolean().default(false),
+    gdpr_consent: z.boolean().refine((val) => val === true, {
+        message: 'É obrigatório aceitar o consentimento RGPD',
+    }),
     notes: z.string().optional(),
     status: z.enum(['active', 'inactive']),
 }));

@@ -158,25 +158,6 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="gdpr_consent" class="md:col-span-2">
-                            <FormItem class="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        v-bind="componentField"
-                                        :checked="componentField.value"
-                                    />
-                                </FormControl>
-                                <div class="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Consentimento RGPD
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Autoriza o tratamento dos dados pessoais
-                                    </FormDescription>
-                                </div>
-                            </FormItem>
-                        </FormField>
-
                         <FormField v-slot="{ componentField }" name="notes" class="md:col-span-2">
                             <FormItem class="space-y-2">
                                 <FormLabel>Observações</FormLabel>
@@ -191,7 +172,7 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="status">
+                        <FormField v-slot="{ componentField }" name="status" class="md:col-span-2">
                             <FormItem class="space-y-2">
                                 <FormLabel>Estado</FormLabel>
                                 <Select v-bind="componentField">
@@ -230,7 +211,6 @@ import { useForm } from 'vee-validate';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import * as z from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 
@@ -251,7 +231,6 @@ const schema = toTypedSchema(z.object({
     mobile: z.string().optional(),
     website: z.string().refine((val) => !val || z.string().url().safeParse(val).success, { message: 'URL inválida' }).optional(),
     email: z.string().refine((val) => !val || z.string().email().safeParse(val).success, { message: 'Email inválido' }).optional(),
-    gdpr_consent: z.boolean().default(false),
     notes: z.string().optional(),
     status: z.enum(['active', 'inactive']),
 }));
@@ -270,7 +249,6 @@ const { handleSubmit } = useForm({
         mobile: props.entity?.mobile || '',
         website: props.entity?.website || '',
         email: props.entity?.email || '',
-        gdpr_consent: props.entity?.gdpr_consent || false,
         notes: props.entity?.notes || '',
         status: props.entity?.status || 'active',
     },
@@ -305,7 +283,6 @@ const onSubmit = handleSubmit((values) => {
     inertiaForm.mobile = values.mobile || '';
     inertiaForm.website = values.website || '';
     inertiaForm.email = values.email || '';
-    inertiaForm.gdpr_consent = values.gdpr_consent || false;
     inertiaForm.notes = values.notes || '';
     inertiaForm.status = values.status;
     
