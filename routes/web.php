@@ -8,6 +8,7 @@ use Laravel\Fortify\Features;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticatedSessionController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\ContactFunctionController;
 use App\Http\Controllers\EntityController;
 
 Route::get('/', function () {
@@ -33,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(Features::enabled(Features::twoFactorAuthentication()) ? '2fa' : null);
 
     Route::resource('countries', CountryController::class);
+    Route::resource('contact-functions', ContactFunctionController::class);
 
     Route::get('/clients', function (Request $request) {
         return app(EntityController::class)->index($request->merge(['type' => 'client']));
