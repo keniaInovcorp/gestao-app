@@ -17,6 +17,13 @@
                             >
                                 Dashboard
                             </Link>
+                            <Link
+                                href="/clients"
+                                class="px-3 py-2 rounded-md text-sm font-medium transition"
+                                :class="$page.url.startsWith('/clients') || $page.url.startsWith('/entities') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'"
+                            >
+                                Clientes
+                            </Link>
                             <div class="relative group">
                                 <button class="px-3 py-2 rounded-md text-sm font-medium transition flex items-center"
                                     :class="$page.url.startsWith('/countries') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'">
@@ -53,7 +60,7 @@
             </div>
         </div>
 
-        <main>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <slot />
         </main>
     </div>

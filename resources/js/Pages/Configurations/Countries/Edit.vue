@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <Head title="Editar País" />
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="py-8">
         <div class="mb-6">
             <Link href="/countries" class="text-blue-600 hover:text-blue-900 mb-4 inline-block">
                 ← Voltar
@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold">Editar País</h1>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6 max-w-2xl">
+        <div class="bg-white rounded-lg shadow p-6">
             <form @submit="onSubmit">
                 <FormField v-slot="{ componentField }" name="code">
                     <FormItem>
@@ -81,7 +81,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as z from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
-import { computed } from 'vue';
 
 const props = defineProps({
     country: Object,
@@ -113,14 +112,7 @@ const onSubmit = handleSubmit((values) => {
     inertiaForm.name = values.name;
     inertiaForm.status = values.status;
     
-    inertiaForm.put(`/countries/${props.country.id}`, {
-        onSuccess: () => {
-            console.log('Success!');
-        },
-        onError: (errors) => {
-            console.log('Errors:', errors);
-        },
-    });
+    inertiaForm.put(`/countries/${props.country.id}`);
 });
 </script>
 

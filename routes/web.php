@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticatedSessionController;
-use Laravel\Fortify\Http\Controllers\ConfirmablePasswordController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\EntityController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -33,4 +34,19 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('countries', CountryController::class);
 
+    Route::get('/clients', function (Request $request) {
+        return app(EntityController::class)->index($request->merge(['type' => 'client']));
+    })->name('clients.index');
+    
+    Route::get('/clients/create', function (Request $request) {
+        return app(EntityController::class)->create($request->merge(['type' => 'client']));
+    })->name('clients.create');
+
+    Route::post('/entities', [EntityController::class, 'store'])->name('entities.store');
+    Route::get('/entities/{entity}', [EntityController::class, 'show'])->name('entities.show');
+    Route::get('/entities/{entity}/edit', [EntityController::class, 'edit'])->name('entities.edit');
+    Route::put('/entities/{entity}', [EntityController::class, 'update'])->name('entities.update');
+    Route::delete('/entities/{entity}', [EntityController::class, 'destroy'])->name('entities.destroy');
+
+    Route::post('/entities/validate-vies', [EntityController::class, 'validateVies'])->name('entities.validate-vies');
 });

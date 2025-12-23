@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <Head title="Criar País" />
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="py-8">
         <div class="mb-6">
             <Link href="/countries" class="text-blue-600 hover:text-blue-900 mb-4 inline-block">
                 ← Voltar
@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold">Criar País</h1>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6 max-w-2xl">
+        <div class="bg-white rounded-lg shadow p-6">
             <form @submit="onSubmit">
                 <FormField v-slot="{ componentField }" name="code">
                     <FormItem>
@@ -104,24 +104,11 @@ const inertiaForm = useInertiaForm({
 });
 
 const onSubmit = handleSubmit((values) => {
-    console.log('Submitting:', values);
     inertiaForm.code = values.code;
     inertiaForm.name = values.name;
     inertiaForm.status = values.status;
     
-    inertiaForm.post('/countries', {
-        onSuccess: () => {
-            console.log('Success!');
-        },
-        onError: (errors) => {
-            console.log('Errors:', errors);
-        },
-        onFinish: () => {
-            console.log('Finished');
-        }
-    });
-}, (errors) => {
-    console.log('Validation errors:', errors);
+    inertiaForm.post('/countries');
 });
 </script>
 
