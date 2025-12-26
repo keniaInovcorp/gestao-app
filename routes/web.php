@@ -13,6 +13,7 @@ use App\Http\Controllers\VatRateController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EntityController;
+use App\Http\Controllers\QuotationController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -66,4 +67,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/entities/{entity}', [EntityController::class, 'destroy'])->name('entities.destroy');
 
     Route::post('/entities/validate-vies', [EntityController::class, 'validateVies'])->name('entities.validate-vies');
+
+    Route::resource('quotations', QuotationController::class);
+    Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+    Route::post('/quotations/{quotation}/convert-to-order', [QuotationController::class, 'convertToOrder'])->name('quotations.convert-to-order');
 });
