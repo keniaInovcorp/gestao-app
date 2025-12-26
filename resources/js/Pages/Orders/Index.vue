@@ -15,6 +15,7 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Validade</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
@@ -27,6 +28,7 @@
                                 {{ order.order_date ? formatDate(order.order_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ order.number }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ order.validity ? formatDate(order.validity) : '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(order.client?.name || '-') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{{ formatCurrency(calculateTotal(order)) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -43,7 +45,7 @@
                             </td>
                         </tr>
                         <tr v-else>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
                                 Nenhuma encomenda encontrada. <Link href="/orders/create" class="text-blue-600 hover:text-blue-900">Criar a primeira encomenda</Link>
                             </td>
                         </tr>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\SupplierOrder;
 use App\Models\Entity;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -78,6 +79,7 @@ class OrderController extends Controller
             'number' => $number,
             'order_date' => $request->order_date,
             'client_id' => $request->client_id,
+            'validity' => $request->validity,
             'status' => $request->status,
         ]);
 
@@ -131,6 +133,9 @@ class OrderController extends Controller
         $orderData = $order->toArray();
         if ($order->order_date) {
             $orderData['order_date'] = $order->order_date->format('Y-m-d');
+        }
+        if ($order->validity) {
+            $orderData['validity'] = $order->validity->format('Y-m-d');
         }
 
         return Inertia::render('Orders/Edit', [
@@ -203,7 +208,61 @@ class OrderController extends Controller
                 ->with('error', 'Apenas encomendas fechadas podem ser convertidas em encomendas fornecedor');
         }
 
-        return redirect()->route('orders.index')
-            ->with('success', 'Funcionalidade de conversão para encomenda fornecedor será implementada em breve');
+        $order->load(['lines.product', 'lines.supplier']);
+
+        $linesBySupplier = [];
+        foreach ($order->lines as $line) {
+            if (!$line->supplier_id) {
+                continue;
+            }
+            
+            if (!isset($linesBySupplier[$line->supplier_id])) {
+                $linesBySupplier[$line->supplier_id] = [];
+            }
+            
+            $linesBySupplier[$line->supplier_id][] = $line;
+        }
+
+        if (empty($linesBySupplier)) {
+            return redirect()->route('orders.index')
+                ->with('error', 'A encomenda não tem linhas com fornecedor associado');
+        }
+
+        $year = Carbon::now()->format('Y');
+        $createdCount = 0;
+
+        foreach ($linesBySupplier as $supplierId => $lines) {
+            $lastSupplierOrder = SupplierOrder::orderBy('number', 'desc')->first();
+            
+            if ($lastSupplierOrder && str_starts_with($lastSupplierOrder->number, $year)) {
+                $lastNumber = (int) substr($lastSupplierOrder->number, -4);
+                $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $nextNumber = '0001';
+            }
+            
+            $number = $year . '/' . $nextNumber;
+
+            $supplierOrder = SupplierOrder::create([
+                'number' => $number,
+                'order_date' => Carbon::now(),
+                'supplier_id' => $supplierId,
+                'order_id' => $order->id,
+                'status' => 'closed',
+            ]);
+
+            foreach ($lines as $line) {
+                $supplierOrder->lines()->create([
+                    'product_id' => $line->product_id,
+                    'quantity' => $line->quantity,
+                    'unit_price' => $line->unit_price,
+                ]);
+            }
+
+            $createdCount++;
+        }
+
+        return redirect()->route('supplier-orders.index')
+            ->with('success', "Encomenda convertida com sucesso. Foram criadas {$createdCount} encomenda(s) fornecedor.");
     }
 }

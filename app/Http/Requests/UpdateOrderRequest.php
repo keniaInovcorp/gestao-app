@@ -22,6 +22,7 @@ class UpdateOrderRequest extends FormRequest
         return [
             'client_id' => ['required', 'exists:entities,id'],
             'order_date' => ['nullable', 'date'],
+            'validity' => ['required', 'date'],
             'status' => ['required', 'in:draft,closed'],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.product_id' => ['required', 'exists:products,id'],

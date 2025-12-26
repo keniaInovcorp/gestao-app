@@ -44,6 +44,19 @@
                             </FormItem>
                         </FormField>
 
+                        <FormField v-slot="{ componentField }" name="validity">
+                            <FormItem class="space-y-2">
+                                <FormLabel>Validade</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        v-bind="componentField"
+                                        type="date"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </FormField>
+
                         <FormField v-slot="{ componentField }" name="status">
                             <FormItem class="space-y-2">
                                 <FormLabel>Estado</FormLabel>
@@ -206,6 +219,7 @@ const lines = ref([]);
 const schema = toTypedSchema(z.object({
     client_id: z.string().min(1, 'O cliente é obrigatório'),
     order_date: z.string().optional(),
+    validity: z.string().min(1, 'A validade é obrigatória'),
     status: z.enum(['draft', 'closed']),
 }));
 
@@ -230,6 +244,7 @@ const { handleSubmit, setFieldError, setValues } = useForm({
     initialValues: {
         client_id: '',
         order_date: '',
+        validity: '',
         status: 'draft',
     },
 });
@@ -237,6 +252,7 @@ const { handleSubmit, setFieldError, setValues } = useForm({
 const inertiaForm = useInertiaForm({
     client_id: '',
     order_date: '',
+    validity: '',
     status: 'draft',
     lines: [],
 });
@@ -299,6 +315,10 @@ const handleClientChange = (value) => {
     if (value && !inertiaForm.order_date) {
         const today = new Date();
         inertiaForm.order_date = today.toISOString().split('T')[0];
+        
+        const validityDate = new Date(today);
+        validityDate.setDate(validityDate.getDate() + 30);
+        inertiaForm.validity = validityDate.toISOString().split('T')[0];
     }
 };
 
@@ -306,14 +326,18 @@ const initializeForm = () => {
     if (props.order) {
         const formattedOrderDate = formatDateForInput(props.order.order_date);
         
+        const formattedValidity = formatDateForInput(props.order.validity);
+        
         setValues({
             client_id: props.order.client_id?.toString() || '',
             order_date: formattedOrderDate,
+            validity: formattedValidity,
             status: props.order.status || 'draft',
         });
         
         inertiaForm.client_id = props.order.client_id?.toString() || '';
         inertiaForm.order_date = formattedOrderDate;
+        inertiaForm.validity = formattedValidity;
         inertiaForm.status = props.order.status || 'draft';
     }
 };
@@ -356,6 +380,7 @@ const onSubmit = handleSubmit((values) => {
 
     inertiaForm.client_id = values.client_id;
     inertiaForm.order_date = values.order_date || null;
+    inertiaForm.validity = values.validity;
     inertiaForm.status = values.status;
     inertiaForm.lines = validLines.map(line => ({
         product_id: line.product_id,
