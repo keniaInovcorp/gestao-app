@@ -16,6 +16,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierOrderController;
+use App\Http\Controllers\SupplierInvoiceController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -79,4 +80,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/orders/{order}/convert-to-supplier-order', [OrderController::class, 'convertToSupplierOrder'])->name('orders.convert-to-supplier-order');
 
     Route::resource('supplier-orders', SupplierOrderController::class)->only(['index', 'show']);
+
+    Route::resource('supplier-invoices', SupplierInvoiceController::class);
+    Route::get('/supplier-invoices/{supplierInvoice}/download-document', [SupplierInvoiceController::class, 'downloadDocument'])->name('supplier-invoices.download-document');
+    Route::get('/supplier-invoices/{supplierInvoice}/download-payment-proof', [SupplierInvoiceController::class, 'downloadPaymentProof'])->name('supplier-invoices.download-payment-proof');
 });

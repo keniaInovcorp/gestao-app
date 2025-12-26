@@ -6,10 +6,13 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\SupplierOrder;
+use App\Models\SupplierOrderLine;
+use App\Models\SupplierInvoice;
 use App\Models\Entity;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
@@ -259,10 +262,58 @@ class OrderController extends Controller
                 ]);
             }
 
+            $supplierOrder->load('lines');
+            $totalAmount = $supplierOrder->total;
+
+            $lastInvoice = SupplierInvoice::orderBy('number', 'desc')->first();
+            
+            if ($lastInvoice && str_starts_with($lastInvoice->number, $year)) {
+                $lastNumber = (int) substr($lastInvoice->number, -4);
+                $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $nextNumber = '0001';
+            }
+            
+            $invoiceNumber = $year . '/' . $nextNumber;
+
+            $supplierInvoice = SupplierInvoice::create([
+                'number' => $invoiceNumber,
+                'invoice_date' => Carbon::now(),
+                'due_date' => Carbon::now()->addDays(30),
+                'supplier_id' => $supplierId,
+                'supplier_order_id' => $supplierOrder->id,
+                'total_amount' => $totalAmount,
+                'status' => 'pending',
+            ]);
+
+            $this->generateInvoicePdf($supplierInvoice);
+
             $createdCount++;
         }
 
         return redirect()->route('supplier-orders.index')
-            ->with('success', "Encomenda convertida com sucesso. Foram criadas {$createdCount} encomenda(s) fornecedor.");
+            ->with('success', "Encomenda convertida com sucesso. Foram criadas {$createdCount} encomenda(s) fornecedor e {$createdCount} fatura(s).");
+    }
+
+    /**
+     * Generate PDF for supplier invoice and save it.
+     */
+    private function generateInvoicePdf(SupplierInvoice $supplierInvoice): void
+    {
+        $supplierInvoice->load(['supplier.country', 'supplierOrder.lines.product.vatRate']);
+
+        try {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('supplier-invoices.pdf', [
+                'invoice' => $supplierInvoice,
+            ]);
+
+            $filename = 'fatura-' . str_replace(['/', '\\'], '-', $supplierInvoice->number) . '.pdf';
+            $path = 'faturas-fornecedor/' . $filename;
+            
+            Storage::disk('private')->put($path, $pdf->output());
+            
+            $supplierInvoice->update(['document' => $path]);
+        } catch (\Exception $e) {
+        }
     }
 }
