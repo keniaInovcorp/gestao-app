@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreQuotationRequest;
 use App\Http\Requests\UpdateQuotationRequest;
 use App\Models\Quotation;
+use App\Models\Order;
 use App\Models\Entity;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -210,7 +211,37 @@ class QuotationController extends Controller
                 ->with('error', 'Apenas propostas fechadas podem ser convertidas em encomendas');
         }
 
-        return redirect()->route('quotations.index')
-            ->with('success', 'Funcionalidade de conversão para encomenda será implementada em breve');
+        $quotation->load(['lines.product', 'lines.supplier']);
+
+        $lastOrder = Order::orderBy('number', 'desc')->first();
+        $year = Carbon::now()->format('Y');
+        
+        if ($lastOrder && str_starts_with($lastOrder->number, $year)) {
+            $lastNumber = (int) substr($lastOrder->number, -4);
+            $nextNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $nextNumber = '0001';
+        }
+        
+        $number = $year . '/' . $nextNumber;
+
+        $order = Order::create([
+            'number' => $number,
+            'order_date' => null,
+            'client_id' => $quotation->client_id,
+            'status' => 'draft',
+        ]);
+
+        foreach ($quotation->lines as $line) {
+            $order->lines()->create([
+                'product_id' => $line->product_id,
+                'supplier_id' => $line->supplier_id,
+                'quantity' => $line->quantity,
+                'unit_price' => $line->unit_price,
+            ]);
+        }
+
+        return redirect()->route('orders.index')
+            ->with('success', 'Proposta convertida em encomenda com sucesso');
     }
 }

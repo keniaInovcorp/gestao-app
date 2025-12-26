@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EntityController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -71,4 +72,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('quotations', QuotationController::class);
     Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
     Route::post('/quotations/{quotation}/convert-to-order', [QuotationController::class, 'convertToOrder'])->name('quotations.convert-to-order');
+
+    Route::resource('orders', OrderController::class);
+    Route::get('/orders/{order}/pdf', [OrderController::class, 'pdf'])->name('orders.pdf');
+    Route::post('/orders/{order}/convert-to-supplier-order', [OrderController::class, 'convertToSupplierOrder'])->name('orders.convert-to-supplier-order');
 });

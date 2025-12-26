@@ -88,9 +88,20 @@
                             Nenhuma linha adicionada. Clique em "Adicionar Linha" para começar.
                         </div>
 
-                        <div v-for="(line, index) in lines" :key="index" class="border rounded-lg p-4 mb-4">
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div class="md:col-span-2">
+                        <div v-for="(line, index) in lines" :key="index" class="border rounded-lg p-4 mb-4 relative">
+                            <Button 
+                                type="button" 
+                                @click="removeLine(index)" 
+                                variant="destructive" 
+                                size="sm"
+                                class="absolute top-2 right-2 h-6 w-6 p-0 flex items-center justify-center hover:opacity-80 transition-opacity"
+                            >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </Button>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
                                     <label class="block text-sm font-medium mb-2">Artigo</label>
                                     <div class="relative">
                                         <Input
@@ -118,22 +129,16 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-2">Fornecedor</label>
                                     <Select v-model="line.supplier_id">
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Selecione o fornecedor" />
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Selecione o fornecedor" class="truncate" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="">Nenhum</SelectItem>
-                                            <SelectItem v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id.toString()">
-                                                {{ supplier.name }}
+                                            <SelectItem v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id.toString()" class="truncate">
+                                                <span class="truncate block">{{ supplier.name }}</span>
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                </div>
-
-                                <div class="flex gap-2 items-end">
-                                    <Button type="button" @click="removeLine(index)" variant="destructive" size="sm">
-                                        Remover
-                                    </Button>
                                 </div>
                             </div>
 

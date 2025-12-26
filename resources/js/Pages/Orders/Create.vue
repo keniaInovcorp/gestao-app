@@ -1,12 +1,12 @@
 <template>
     <AuthenticatedLayout>
-        <Head title="Editar Proposta" />
+        <Head title="Criar Encomenda" />
         <div class="py-8">
             <div class="mb-6">
-                <Link href="/quotations" class="text-blue-600 hover:text-blue-900 mb-4 inline-block">
+                <Link href="/orders" class="text-blue-600 hover:text-blue-900 mb-4 inline-block">
                     ← Voltar
                 </Link>
-                <h1 class="text-2xl font-bold">Editar Proposta</h1>
+                <h1 class="text-2xl font-bold">Criar Encomenda</h1>
             </div>
 
             <div class="bg-white rounded-lg shadow p-6">
@@ -31,22 +31,9 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="quotation_date">
+                        <FormField v-slot="{ componentField }" name="order_date">
                             <FormItem class="space-y-2">
-                                <FormLabel>Data da Proposta</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        v-bind="componentField"
-                                        type="date"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
-
-                        <FormField v-slot="{ componentField }" name="validity">
-                            <FormItem class="space-y-2">
-                                <FormLabel>Validade</FormLabel>
+                                <FormLabel>Data da Encomenda</FormLabel>
                                 <FormControl>
                                     <Input
                                         v-bind="componentField"
@@ -142,7 +129,7 @@
                                 </div>
                             </div>
 
-                            <div v-if="line.product" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div v-if="line.product" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div>
                                     <label class="block text-sm font-medium mb-2">Quantidade</label>
                                     <Input
@@ -164,16 +151,6 @@
                                         @input="updateLineTotal(index)"
                                     />
                                 </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Preço de Custo</label>
-                                    <Input
-                                        v-model.number="line.cost_price"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
                             </div>
 
                             <div v-if="line.product" class="mt-2 text-sm text-gray-600">
@@ -193,7 +170,7 @@
                         <Button
                             type="button"
                             variant="outline"
-                            @click="router.visit('/quotations')"
+                            @click="router.visit('/orders')"
                             class="cursor-pointer"
                         >
                             Cancelar
@@ -215,10 +192,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as z from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
-import { ref, onMounted, watch } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
-    quotation: Object,
     clients: Array,
     products: Array,
     suppliers: Array,
@@ -228,41 +204,22 @@ const lines = ref([]);
 
 const schema = toTypedSchema(z.object({
     client_id: z.string().min(1, 'O cliente é obrigatório'),
-    quotation_date: z.string().optional(),
-    validity: z.string().min(1, 'A validade é obrigatória'),
+    order_date: z.string().optional(),
     status: z.enum(['draft', 'closed']),
 }));
 
-const formatDateForInput = (date) => {
-    if (!date) return '';
-    if (typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        return date;
-    }
-    if (typeof date === 'string') {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return '';
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    return '';
-};
-
-const { handleSubmit, setFieldError, setValues, resetForm } = useForm({
+const { handleSubmit, setFieldError } = useForm({
     validationSchema: schema,
     initialValues: {
         client_id: '',
-        quotation_date: '',
-        validity: '',
+        order_date: '',
         status: 'draft',
     },
 });
 
 const inertiaForm = useInertiaForm({
     client_id: '',
-    quotation_date: '',
-    validity: '',
+    order_date: '',
     status: 'draft',
     lines: [],
 });
@@ -278,7 +235,6 @@ const addLine = () => {
         supplier_id: '',
         quantity: 1,
         unit_price: 0,
-        cost_price: null,
         searchTerm: '',
         suggestions: [],
         showSuggestions: false,
@@ -309,9 +265,7 @@ const selectProduct = (index, product) => {
     const line = lines.value[index];
     line.product = product;
     line.product_id = product.id;
-    if (!line.unit_price) {
-        line.unit_price = product.price;
-    }
+    line.unit_price = product.price;
     line.searchTerm = product.reference + ' - ' + product.name;
     line.suggestions = [];
     line.showSuggestions = false;
@@ -323,59 +277,11 @@ const updateLineTotal = (index) => {
 };
 
 const handleClientChange = (value) => {
-    if (value && !inertiaForm.quotation_date) {
+    if (value && !inertiaForm.order_date) {
         const today = new Date();
-        inertiaForm.quotation_date = today.toISOString().split('T')[0];
-        
-        const validityDate = new Date(today);
-        validityDate.setDate(validityDate.getDate() + 30);
-        inertiaForm.validity = validityDate.toISOString().split('T')[0];
+        inertiaForm.order_date = today.toISOString().split('T')[0];
     }
 };
-
-const initializeForm = () => {
-    if (props.quotation) {
-        const formattedQuotationDate = formatDateForInput(props.quotation.quotation_date);
-        const formattedValidity = formatDateForInput(props.quotation.validity);
-        
-        setValues({
-            client_id: props.quotation.client_id?.toString() || '',
-            quotation_date: formattedQuotationDate,
-            validity: formattedValidity,
-            status: props.quotation.status || 'draft',
-        });
-        
-        inertiaForm.client_id = props.quotation.client_id?.toString() || '';
-        inertiaForm.quotation_date = formattedQuotationDate;
-        inertiaForm.validity = formattedValidity;
-        inertiaForm.status = props.quotation.status || 'draft';
-    }
-};
-
-watch(() => props.quotation, () => {
-    initializeForm();
-}, { immediate: true, deep: true });
-
-onMounted(() => {
-    initializeForm();
-    
-    if (props.quotation?.lines) {
-        props.quotation.lines.forEach(line => {
-            const product = props.products.find(p => p.id === line.product_id);
-            lines.value.push({
-                product_id: line.product_id,
-                product: product,
-                supplier_id: line.supplier_id ? line.supplier_id.toString() : '',
-                quantity: parseFloat(line.quantity),
-                unit_price: parseFloat(line.unit_price),
-                cost_price: line.cost_price ? parseFloat(line.cost_price) : null,
-                searchTerm: product ? (product.reference + ' - ' + product.name) : '',
-                suggestions: [],
-                showSuggestions: false,
-            });
-        });
-    }
-});
 
 const onSubmit = handleSubmit((values) => {
     if (lines.value.length === 0) {
@@ -390,18 +296,16 @@ const onSubmit = handleSubmit((values) => {
     }
 
     inertiaForm.client_id = values.client_id;
-    inertiaForm.quotation_date = values.quotation_date || null;
-    inertiaForm.validity = values.validity;
+    inertiaForm.order_date = values.order_date || null;
     inertiaForm.status = values.status;
     inertiaForm.lines = validLines.map(line => ({
         product_id: line.product_id,
         supplier_id: line.supplier_id || null,
         quantity: parseFloat(line.quantity),
         unit_price: parseFloat(line.unit_price),
-        cost_price: line.cost_price ? parseFloat(line.cost_price) : null,
     }));
     
-    inertiaForm.put(`/quotations/${props.quotation.id}`, {
+    inertiaForm.post('/orders', {
         onError: (errors) => {
             Object.keys(errors).forEach((field) => {
                 setFieldError(field, errors[field]);
