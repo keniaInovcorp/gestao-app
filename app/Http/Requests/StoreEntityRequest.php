@@ -42,7 +42,7 @@ class StoreEntityRequest extends FormRequest
             'mobile' => ['nullable', 'string'],
             'website' => ['nullable', 'url'],
             'email' => ['nullable', 'email'],
-            'gdpr_consent' => ['required', 'boolean', 'accepted'],
+            'gdpr_consent' => ['required', 'boolean'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ];
@@ -67,8 +67,8 @@ class StoreEntityRequest extends FormRequest
             'country_id.exists' => 'O país selecionado é inválido.',
             'website.url' => 'O formato do website é inválido.',
             'email.email' => 'O formato do email é inválido.',
-            'gdpr_consent.required' => 'É obrigatório aceitar o consentimento RGPD.',
-            'gdpr_consent.accepted' => 'É obrigatório aceitar o consentimento RGPD.',
+            'gdpr_consent.required' => 'O consentimento RGPD é obrigatório.',
+            'gdpr_consent.boolean' => 'O consentimento RGPD deve ser Sim ou Não.',
             'status.required' => 'O estado é obrigatório.',
             'status.in' => 'O estado selecionado é inválido.',
         ];

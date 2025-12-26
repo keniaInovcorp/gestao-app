@@ -31,7 +31,7 @@ class StoreContactRequest extends FormRequest
             'phone' => ['nullable', 'string'],
             'mobile' => ['nullable', 'string'],
             'email' => ['nullable', 'email'],
-            'gdpr_consent' => ['required', 'boolean', 'accepted'],
+            'gdpr_consent' => ['required', 'boolean'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ];
@@ -52,8 +52,8 @@ class StoreContactRequest extends FormRequest
             'function_id.required' => 'A função é obrigatória.',
             'function_id.exists' => 'A função selecionada é inválida.',
             'email.email' => 'O formato do email é inválido.',
-            'gdpr_consent.required' => 'É obrigatório aceitar o consentimento RGPD.',
-            'gdpr_consent.accepted' => 'É obrigatório aceitar o consentimento RGPD.',
+            'gdpr_consent.required' => 'O consentimento RGPD é obrigatório.',
+            'gdpr_consent.boolean' => 'O consentimento RGPD deve ser Sim ou Não.',
             'status.required' => 'O estado é obrigatório.',
             'status.in' => 'O estado selecionado é inválido.',
         ];

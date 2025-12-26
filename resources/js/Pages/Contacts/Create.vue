@@ -143,21 +143,17 @@
                         </FormField>
 
                         <FormField v-slot="{ componentField }" name="gdpr_consent" class="md:col-span-2">
-                            <FormItem class="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        :model-value="componentField.value"
-                                        @update:model-value="componentField.onChange"
-                                    />
-                                </FormControl>
-                                <div class="space-y-1 leading-none">
-                                    <FormLabel>
-                                        Consentimento RGPD
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Autoriza o tratamento dos dados pessoais
-                                    </FormDescription>
-                                </div>
+                            <FormItem class="space-y-2">
+                                <FormLabel>Consentimento RGPD</FormLabel>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="true">Sim</SelectItem>
+                                        <SelectItem value="false">Não</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         </FormField>
@@ -194,7 +190,6 @@ import { useForm } from 'vee-validate';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import * as z from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 
@@ -211,9 +206,12 @@ const schema = toTypedSchema(z.object({
     phone: z.string().optional(),
     mobile: z.string().optional(),
     email: z.string().refine((val) => !val || z.string().email().safeParse(val).success, { message: 'Email inválido' }).optional(),
-    gdpr_consent: z.boolean().refine((val) => val === true, {
-        message: 'É obrigatório aceitar o consentimento RGPD',
-    }),
+           gdpr_consent: z.union([z.boolean(), z.string()]).transform((val) => {
+               if (typeof val === 'string') {
+                   return val === 'true';
+               }
+               return val;
+           }).pipe(z.boolean()),
     notes: z.string().optional(),
     status: z.enum(['active', 'inactive']),
 }));
@@ -228,7 +226,7 @@ const { handleSubmit, setFieldError } = useForm({
         phone: '',
         mobile: '',
         email: '',
-        gdpr_consent: false,
+        gdpr_consent: 'true',
         notes: '',
         status: 'active',
     },
@@ -242,7 +240,7 @@ const inertiaForm = useInertiaForm({
     phone: '',
     mobile: '',
     email: '',
-    gdpr_consent: false,
+    gdpr_consent: '',
     notes: '',
     status: 'active',
 });
@@ -255,7 +253,7 @@ const onSubmit = handleSubmit((values) => {
     inertiaForm.phone = values.phone || '';
     inertiaForm.mobile = values.mobile || '';
     inertiaForm.email = values.email || '';
-    inertiaForm.gdpr_consent = values.gdpr_consent || false;
+    inertiaForm.gdpr_consent = values.gdpr_consent === true || values.gdpr_consent === 'true';
     inertiaForm.notes = values.notes || '';
     inertiaForm.status = values.status;
     
