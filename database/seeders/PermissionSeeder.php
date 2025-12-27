@@ -20,6 +20,7 @@ class PermissionSeeder extends Seeder
             'supplier-invoices',
             'users',
             'permission-groups',
+            'logs',
         ];
 
         $actions = ['create', 'read', 'update', 'delete'];

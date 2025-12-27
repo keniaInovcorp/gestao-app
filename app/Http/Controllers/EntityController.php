@@ -10,6 +10,7 @@ use App\Services\ViesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -76,7 +77,7 @@ class EntityController extends Controller
 
         $nextNumber = $lastEntity ? (int)$lastEntity->number + 1 : 1;
 
-        Entity::create([
+        $entity = Entity::create([
             'type' => $request->type,
             'number' => str_pad($nextNumber, 6, '0', STR_PAD_LEFT),
             'tax_number' => $request->tax_number,
@@ -94,6 +95,8 @@ class EntityController extends Controller
             'status' => $request->status,
         ]);
 
+        $this->logActivity($entity, 'created', $request->type === 'client' ? 'client' : 'supplier', $request);
+
         $routeName = $request->type === 'client' ? 'clients.index' : 'suppliers.index';
         return redirect()->route($routeName)
             ->with('success', 'Entidade criada com sucesso');
@@ -109,6 +112,8 @@ class EntityController extends Controller
     {
         $resourceName = $entity->type === 'client' ? 'clients' : 'suppliers';
         $this->checkPermission("{$resourceName}.read");
+
+        $this->logActivity($entity, 'viewed', $entity->type === 'client' ? 'client' : 'supplier', request());
 
         $entity->load('country');
 
@@ -150,6 +155,8 @@ class EntityController extends Controller
         unset($data['gdpr_consent']);
         
         $entity->update($data);
+
+        $this->logActivity($entity, 'updated', $entity->type === 'client' ? 'client' : 'supplier', $request);
 
         $routeName = $entity->type === 'client' ? 'clients.index' : 'suppliers.index';
         return redirect()->route($routeName)
@@ -213,6 +220,10 @@ class EntityController extends Controller
         }
 
         $type = $entity->type;
+        $menuName = $type === 'client' ? 'client' : 'supplier';
+        
+        $this->logActivity($entity, 'deleted', $menuName, request());
+
         $entity->delete();
 
         $routeName = $type === 'client' ? 'clients.index' : 'suppliers.index';
@@ -247,5 +258,39 @@ class EntityController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    /**
+     * Log activity with device and IP address.
+     *
+     * @param Entity $entity
+     * @param string $action
+     * @param string $menuName
+     * @param Request $request
+     * @return void
+     */
+    private function logActivity(Entity $entity, string $action, string $menuName, Request $request): void
+    {
+        $user = Auth::user();
+        $device = $request->userAgent();
+        $ipAddress = $request->ip();
+
+        $description = ucfirst($action) . ' ' . $menuName . ' ' . $entity->name;
+
+        $activity = activity()
+            ->performedOn($entity)
+            ->causedBy($user)
+            ->withProperties([
+                'device' => $device,
+                'ip_address' => $ipAddress,
+            ])
+            ->log($description);
+
+        DB::table('activity_log')
+            ->where('id', $activity->id)
+            ->update([
+                'device' => $device,
+                'ip_address' => $ipAddress,
+            ]);
     }
 }

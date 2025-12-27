@@ -20,6 +20,7 @@ use App\Http\Controllers\SupplierInvoiceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -90,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('users', UserController::class);
     Route::resource('permission-groups', PermissionGroupController::class);
+    
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
