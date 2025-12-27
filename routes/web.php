@@ -17,6 +17,7 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierOrderController;
 use App\Http\Controllers\SupplierInvoiceController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -84,4 +85,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('supplier-invoices', SupplierInvoiceController::class);
     Route::get('/supplier-invoices/{supplierInvoice}/download-document', [SupplierInvoiceController::class, 'downloadDocument'])->name('supplier-invoices.download-document');
     Route::get('/supplier-invoices/{supplierInvoice}/download-payment-proof', [SupplierInvoiceController::class, 'downloadPaymentProof'])->name('supplier-invoices.download-payment-proof');
+
+    Route::resource('users', UserController::class);
 });

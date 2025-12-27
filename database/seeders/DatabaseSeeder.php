@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +14,17 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        User::firstOrCreate(
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'admin', 'guard_name' => 'web'],
+            ['name' => 'admin', 'guard_name' => 'web']
+        );
+
+        $regularRole = Role::firstOrCreate(
+            ['name' => 'regular', 'guard_name' => 'web'],
+            ['name' => 'regular', 'guard_name' => 'web']
+        );
+
+        $admin = User::firstOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'name' => 'Admin',
@@ -22,5 +33,9 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
             ]
         );
+
+        if (!$admin->hasRole('admin')) {
+            $admin->assignRole($adminRole);
+        }
     }
 }

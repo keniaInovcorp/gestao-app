@@ -6,6 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\LoginViewResponse;
 use Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse;
+use Laravel\Fortify\Contracts\ResetPasswordViewResponse;
+use Laravel\Fortify\Contracts\RequestPasswordResetLinkViewResponse;
+use Laravel\Fortify\Contracts\ResetsUserPasswords;
+use App\Actions\Fortify\ResetUserPassword;
 use Inertia\Inertia;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -29,6 +33,29 @@ class FortifyServiceProvider extends ServiceProvider
                 }
             };
         });
+
+        $this->app->singleton(RequestPasswordResetLinkViewResponse::class, function () {
+            return new class implements RequestPasswordResetLinkViewResponse {
+                public function toResponse($request)
+                {
+                    return Inertia::render('Auth/ForgotPassword')->toResponse($request);
+                }
+            };
+        });
+
+        $this->app->singleton(ResetPasswordViewResponse::class, function () {
+            return new class implements ResetPasswordViewResponse {
+                public function toResponse($request)
+                {
+                    return Inertia::render('Auth/ResetPassword', [
+                        'token' => $request->route('token'),
+                        'email' => $request->email,
+                    ])->toResponse($request);
+                }
+            };
+        });
+
+        $this->app->singleton(ResetsUserPasswords::class, ResetUserPassword::class);
     }
 }
 
