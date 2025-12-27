@@ -10,6 +10,7 @@ use App\Services\ViesService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,6 +25,9 @@ class EntityController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type', 'client');
+        $resourceName = $type === 'client' ? 'clients' : 'suppliers';
+        
+        $this->checkPermission("{$resourceName}.read");
 
         $entities = Entity::where('type', $type)
             ->with('country')
@@ -45,6 +49,9 @@ class EntityController extends Controller
     public function create(Request $request)
     {
         $type = $request->get('type', 'client');
+        $resourceName = $type === 'client' ? 'clients' : 'suppliers';
+        
+        $this->checkPermission("{$resourceName}.create");
 
         return Inertia::render('Entities/Create', [
             'type' => $type,
@@ -60,6 +67,9 @@ class EntityController extends Controller
      */
     public function store(StoreEntityRequest $request)
     {
+        $resourceName = $request->type === 'client' ? 'clients' : 'suppliers';
+        $this->checkPermission("{$resourceName}.create");
+
         $lastEntity = Entity::where('type', $request->type)
             ->orderBy('number', 'desc')
             ->first();
@@ -97,6 +107,9 @@ class EntityController extends Controller
      */
     public function show(Entity $entity)
     {
+        $resourceName = $entity->type === 'client' ? 'clients' : 'suppliers';
+        $this->checkPermission("{$resourceName}.read");
+
         $entity->load('country');
 
         return Inertia::render('Entities/Show', [
@@ -112,6 +125,9 @@ class EntityController extends Controller
      */
     public function edit(Entity $entity)
     {
+        $resourceName = $entity->type === 'client' ? 'clients' : 'suppliers';
+        $this->checkPermission("{$resourceName}.update");
+
         return Inertia::render('Entities/Edit', [
             'entity' => $entity->load('country'),
             'countries' => Country::where('status', 'active')->get(),
@@ -127,6 +143,9 @@ class EntityController extends Controller
      */
     public function update(UpdateEntityRequest $request, Entity $entity)
     {
+        $resourceName = $entity->type === 'client' ? 'clients' : 'suppliers';
+        $this->checkPermission("{$resourceName}.update");
+
         $data = $request->validated();
         unset($data['gdpr_consent']);
         
@@ -145,6 +164,54 @@ class EntityController extends Controller
      */
     public function destroy(Entity $entity)
     {
+        $resourceName = $entity->type === 'client' ? 'clients' : 'suppliers';
+        $this->checkPermission("{$resourceName}.delete");
+
+        $errors = [];
+
+        $contactsCount = DB::table('contacts')->where('entity_id', $entity->id)->count();
+        if ($contactsCount > 0) {
+            $errors[] = "{$contactsCount} contacto(s)";
+        }
+
+        $ordersAsClientCount = DB::table('orders')->where('client_id', $entity->id)->count();
+        if ($ordersAsClientCount > 0) {
+            $errors[] = "{$ordersAsClientCount} encomenda(s) como cliente";
+        }
+
+        $quotationsAsClientCount = DB::table('quotations')->where('client_id', $entity->id)->count();
+        if ($quotationsAsClientCount > 0) {
+            $errors[] = "{$quotationsAsClientCount} proposta(s) como cliente";
+        }
+
+        $orderLinesAsSupplierCount = DB::table('order_lines')->where('supplier_id', $entity->id)->count();
+        if ($orderLinesAsSupplierCount > 0) {
+            $errors[] = "{$orderLinesAsSupplierCount} linha(s) de encomenda como fornecedor";
+        }
+
+        $quotationLinesAsSupplierCount = DB::table('quotation_lines')->where('supplier_id', $entity->id)->count();
+        if ($quotationLinesAsSupplierCount > 0) {
+            $errors[] = "{$quotationLinesAsSupplierCount} linha(s) de proposta como fornecedor";
+        }
+
+        $supplierOrdersCount = DB::table('supplier_orders')->where('supplier_id', $entity->id)->count();
+        if ($supplierOrdersCount > 0) {
+            $errors[] = "{$supplierOrdersCount} encomenda(s) fornecedor";
+        }
+
+        $supplierInvoicesCount = DB::table('supplier_invoices')->where('supplier_id', $entity->id)->count();
+        if ($supplierInvoicesCount > 0) {
+            $errors[] = "{$supplierInvoicesCount} fatura(s) fornecedor";
+        }
+
+        if (!empty($errors)) {
+            $errorMessage = "Não pode eliminar esta entidade porque está associada a: " . implode(', ', $errors) . ".";
+            $type = $entity->type;
+            $routeName = $type === 'client' ? 'clients.index' : 'suppliers.index';
+            return redirect()->route($routeName)
+                ->with('error', $errorMessage);
+        }
+
         $type = $entity->type;
         $entity->delete();
 

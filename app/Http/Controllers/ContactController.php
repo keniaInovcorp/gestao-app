@@ -21,6 +21,8 @@ class ContactController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('contacts.read');
+
         $contacts = Contact::with(['entity', 'contactFunction'])
             ->orderBy('number', 'desc')
             ->paginate(15);
@@ -37,6 +39,8 @@ class ContactController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('contacts.create');
+
         return Inertia::render('Contacts/Create', [
             'entities' => Entity::where('status', 'active')->orderBy('name')->get(),
             'contactFunctions' => ContactFunction::where('status', 'active')->orderBy('name')->get(),
@@ -51,6 +55,7 @@ class ContactController extends Controller
      */
     public function store(StoreContactRequest $request): RedirectResponse
     {
+        $this->checkPermission('contacts.create');
         $lastContact = Contact::orderBy('number', 'desc')->first();
         $nextNumber = $lastContact ? (int)$lastContact->number + 1 : 1;
 
@@ -80,6 +85,8 @@ class ContactController extends Controller
      */
     public function show(Contact $contact): Response
     {
+        $this->checkPermission('contacts.read');
+
         $contact->load(['entity', 'contactFunction']);
 
         return Inertia::render('Contacts/Show', [
@@ -95,6 +102,8 @@ class ContactController extends Controller
      */
     public function edit(Contact $contact): Response
     {
+        $this->checkPermission('contacts.update');
+
         return Inertia::render('Contacts/Edit', [
             'contact' => $contact->load(['entity', 'contactFunction']),
             'entities' => Entity::where('status', 'active')->orderBy('name')->get(),
@@ -111,6 +120,8 @@ class ContactController extends Controller
      */
     public function update(UpdateContactRequest $request, Contact $contact): RedirectResponse
     {
+        $this->checkPermission('contacts.update');
+
         $data = $request->validated();
         unset($data['gdpr_consent']);
         
@@ -128,6 +139,8 @@ class ContactController extends Controller
      */
     public function destroy(Contact $contact): RedirectResponse
     {
+        $this->checkPermission('contacts.delete');
+
         $contact->delete();
 
         return redirect()->route('contacts.index')

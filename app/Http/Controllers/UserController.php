@@ -49,7 +49,7 @@ class UserController extends Controller
      */
     public function create(): Response
     {
-        $this->checkAdminAccess();
+        $this->checkPermission('users.create');
 
         $roles = Role::whereIn('name', ['admin', 'regular'])
             ->where('guard_name', 'web')
@@ -72,7 +72,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): RedirectResponse
     {
-        $this->checkAdminAccess();
+        $this->checkPermission('users.create');
 
         $user = User::create([
             'name' => $request->name,
@@ -89,7 +89,7 @@ class UserController extends Controller
             if ($role) {
                 $rolesToAssign[] = $role;
                 
-                if ($request->permission_group_id && $role->name === 'regular') {
+                if ($request->filled('permission_group_id') && $request->permission_group_id && $role->name === 'regular') {
                     $permissionGroup = Role::findById($request->permission_group_id);
                     if ($permissionGroup) {
                         $rolesToAssign[] = $permissionGroup;
@@ -100,6 +100,7 @@ class UserController extends Controller
         
         if (!empty($rolesToAssign)) {
             $user->syncRoles($rolesToAssign);
+            $user->refresh();
         }
 
         $token = Password::createToken($user);
@@ -112,11 +113,25 @@ class UserController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(User $user): Response
+    {
+        $this->checkPermission('users.read');
+
+        $user->load('roles');
+
+        return Inertia::render('Users/Show', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(User $user): Response
     {
-        $this->checkAdminAccess();
+        $this->checkPermission('users.update');
 
         $user->load('roles');
         $roles = Role::whereIn('name', ['admin', 'regular'])
@@ -141,20 +156,14 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        $this->checkAdminAccess();
+        $this->checkPermission('users.update');
 
-        $data = [
+        $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'mobile' => $request->mobile,
             'status' => $request->status,
-        ];
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $user->update($data);
+        ]);
 
         $rolesToAssign = [];
         $role = Role::findById($request->role_id);
@@ -162,7 +171,7 @@ class UserController extends Controller
         if ($role) {
             $rolesToAssign[] = $role;
             
-            if ($request->permission_group_id && $role->name === 'regular') {
+            if ($request->filled('permission_group_id') && $request->permission_group_id && $role->name === 'regular') {
                 $permissionGroup = Role::findById($request->permission_group_id);
                 if ($permissionGroup) {
                     $rolesToAssign[] = $permissionGroup;
@@ -171,6 +180,7 @@ class UserController extends Controller
         }
         
         $user->syncRoles($rolesToAssign);
+        $user->refresh();
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador atualizado com sucesso');
@@ -181,7 +191,7 @@ class UserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
-        $this->checkAdminAccess();
+        $this->checkPermission('users.delete');
 
         if ($user->id === Auth::id()) {
             return redirect()->route('users.index')

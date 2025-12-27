@@ -52,23 +52,6 @@
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ componentField }" name="password">
-                            <FormItem class="space-y-2">
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        v-bind="componentField"
-                                        type="password"
-                                        placeholder="Deixe em branco para manter a password atual"
-                                    />
-                                </FormControl>
-                                <FormDescription>
-                                    Deixe em branco para manter a password atual
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        </FormField>
-
                         <FormField v-slot="{ componentField }" name="role_id">
                             <FormItem class="space-y-2">
                                 <FormLabel>Tipo de Utilizador</FormLabel>
@@ -89,12 +72,12 @@
                         <FormField v-slot="{ componentField }" name="permission_group_id" v-if="selectedRoleId && isRegularUser">
                             <FormItem class="space-y-2">
                                 <FormLabel>Grupo de Permissões</FormLabel>
-                                <Select v-bind="componentField">
+                                <Select v-bind="componentField" @update:model-value="handlePermissionGroupChange">
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione o grupo de permissões (opcional)" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">Nenhum</SelectItem>
+                                        <SelectItem value="none">Nenhum</SelectItem>
                                         <SelectItem v-for="group in permissionGroups" :key="group.id" :value="group.id.toString()">
                                             {{ group.name }}
                                         </SelectItem>
@@ -188,6 +171,14 @@ const handleRoleChange = (value) => {
     }
 };
 
+const handlePermissionGroupChange = (value) => {
+    if (value === 'none' || value === null || value === undefined || value === '') {
+        inertiaForm.permission_group_id = '';
+    } else {
+        inertiaForm.permission_group_id = value;
+    }
+};
+
 watch(() => props.user, () => {
     const base = baseRole.value;
     if (base) {
@@ -198,21 +189,30 @@ watch(() => props.user, () => {
     if (group) {
         inertiaForm.permission_group_id = group.id.toString();
     } else {
-        inertiaForm.permission_group_id = '';
+        inertiaForm.permission_group_id = 'none';
     }
 }, { immediate: true });
+
+watch(() => selectedRoleId.value, (newValue) => {
+    const selectedRole = props.roles.find(r => r.id.toString() === newValue);
+    if (!selectedRole || selectedRole.name !== 'regular') {
+        inertiaForm.permission_group_id = 'none';
+    }
+});
 
 const schema = toTypedSchema(z.object({
     name: z.string().min(1, 'O nome é obrigatório'),
     email: z.string().email('Email inválido').min(1, 'O email é obrigatório'),
     mobile: z.string().optional(),
-    password: z.string().refine((val) => !val || val.length >= 8, {
-        message: 'A password deve ter pelo menos 8 caracteres'
-    }).optional(),
     role_id: z.string().min(1, 'O tipo de utilizador é obrigatório'),
-    permission_group_id: z.string().optional(),
+    permission_group_id: z.string().optional().or(z.literal('none')),
     status: z.enum(['active', 'inactive']),
 }));
+
+const getInitialPermissionGroupId = () => {
+    const group = permissionGroupRole.value;
+    return group ? group.id.toString() : 'none';
+};
 
 const { handleSubmit } = useForm({
     validationSchema: schema,
@@ -220,9 +220,8 @@ const { handleSubmit } = useForm({
         name: props.user?.name || '',
         email: props.user?.email || '',
         mobile: props.user?.mobile || '',
-        password: '',
         role_id: baseRole.value?.id.toString() || '',
-        permission_group_id: permissionGroupRole.value?.id.toString() || '',
+        permission_group_id: getInitialPermissionGroupId(),
         status: props.user?.status || 'active',
     },
 });
@@ -231,9 +230,8 @@ const inertiaForm = useInertiaForm({
     name: props.user?.name || '',
     email: props.user?.email || '',
     mobile: props.user?.mobile || '',
-    password: '',
     role_id: baseRole.value?.id.toString() || '',
-    permission_group_id: permissionGroupRole.value?.id.toString() || '',
+    permission_group_id: getInitialPermissionGroupId(),
     status: props.user?.status || 'active',
 });
 
@@ -242,7 +240,14 @@ const onSubmit = handleSubmit((values) => {
     inertiaForm.email = values.email;
     inertiaForm.mobile = values.mobile || '';
     inertiaForm.role_id = values.role_id || '';
-    inertiaForm.permission_group_id = values.permission_group_id || '';
+    
+    const permissionGroupId = values.permission_group_id === 'none' || 
+                              values.permission_group_id === null || 
+                              values.permission_group_id === undefined || 
+                              values.permission_group_id === '' 
+                              ? '' 
+                              : values.permission_group_id;
+    inertiaForm.permission_group_id = permissionGroupId;
     inertiaForm.status = values.status;
     
     if (values.password && values.password.trim() !== '') {

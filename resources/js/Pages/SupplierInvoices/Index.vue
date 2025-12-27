@@ -4,7 +4,16 @@
         <div class="py-8">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Faturas Fornecedor</h1>
+                <Link 
+                    v-if="canCreate('supplier-invoices')"
+                    href="/supplier-invoices/create" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                    Adicionar Fatura
+                </Link>
             </div>
+
+            <FlashMessages />
 
             <div v-if="supplierInvoices && supplierInvoices.data" class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -29,8 +38,15 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(invoice.supplier?.name || '-') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{{ invoice.supplier_order?.number || '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <button v-if="invoice.document" @click="downloadDocument(invoice.id)" class="text-blue-600 hover:text-blue-900">
-                                    Ver PDF
+                                <button 
+                                    v-if="canRead('supplier-invoices') && invoice.document" 
+                                    @click="downloadDocument(invoice.id)" 
+                                    class="text-blue-600 hover:text-blue-900"
+                                    title="Ver PDF"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
                                 </button>
                                 <span v-else class="text-gray-400">-</span>
                             </td>
@@ -41,9 +57,40 @@
                                     {{ invoice.status === 'paid' ? 'Paga' : 'Pendente de Pagamento' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                                <Link :href="`/supplier-invoices/${invoice.id}/edit`" class="text-blue-600 hover:text-blue-900">Editar</Link>
-                                <button @click="deleteInvoice(invoice.id)" class="text-red-600 hover:text-red-900">Eliminar</button>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <Link 
+                                        v-if="canRead('supplier-invoices')"
+                                        :href="`/supplier-invoices/${invoice.id}`" 
+                                        class="text-blue-600 hover:text-blue-900"
+                                        title="Detalhes"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </Link>
+                                    <Link 
+                                        v-if="canUpdate('supplier-invoices')"
+                                        :href="`/supplier-invoices/${invoice.id}/edit`" 
+                                        class="text-yellow-600 hover:text-yellow-900"
+                                        title="Editar"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </Link>
+                                    <button
+                                        v-if="canDelete('supplier-invoices')"
+                                        @click="deleteInvoice(invoice)"
+                                        class="text-red-600 hover:text-red-900"
+                                        title="Eliminar"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-else>
@@ -105,7 +152,9 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import FlashMessages from '@/components/FlashMessages.vue';
 import { truncate } from '@/utils/truncate';
+import { usePermissions } from '@/composables/usePermissions';
 
 const props = defineProps({
     supplierInvoices: {
@@ -113,6 +162,8 @@ const props = defineProps({
         default: () => ({ data: [] })
     },
 });
+
+const { canCreate, canRead, canUpdate, canDelete } = usePermissions();
 
 const formatDate = (date) => {
     if (!date) return '-';
@@ -130,15 +181,11 @@ const downloadDocument = (id) => {
     window.location.href = `/supplier-invoices/${id}/download-document`;
 };
 
-const deleteInvoice = (id) => {
-    if (confirm('Tem a certeza que deseja eliminar esta fatura?')) {
-        router.delete(`/supplier-invoices/${id}`, {
+const deleteInvoice = (invoice) => {
+    if (confirm(`Tem a certeza que deseja eliminar a fatura "${invoice.number}"?`)) {
+        router.delete(`/supplier-invoices/${invoice.id}`, {
             preserveScroll: true,
-            onSuccess: () => {
-                // Success handled by Inertia
-            },
         });
     }
 };
 </script>
-

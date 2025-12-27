@@ -14,6 +14,8 @@ class SupplierOrderController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('supplier-orders.read');
+
         $supplierOrders = SupplierOrder::with(['supplier', 'order.client', 'lines.product'])
             ->orderBy('order_date', 'desc')
             ->orderBy('number', 'desc')
@@ -29,6 +31,8 @@ class SupplierOrderController extends Controller
      */
     public function show(SupplierOrder $supplierOrder): Response
     {
+        $this->checkPermission('supplier-orders.read');
+
         $supplierOrder->load(['supplier', 'order.client', 'lines.product']);
 
         return Inertia::render('SupplierOrders/Show', [

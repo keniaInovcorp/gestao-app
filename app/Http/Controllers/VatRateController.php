@@ -16,6 +16,8 @@ class VatRateController extends Controller
      */
     public function index()
     {
+        $this->checkPermission('vat-rates.read');
+
         try {
             $vatRates = VatRate::orderBy('percentage')->paginate(15);
         } catch (\Exception $e) {
@@ -38,6 +40,8 @@ class VatRateController extends Controller
      */
     public function create()
     {
+        $this->checkPermission('vat-rates.create');
+
         return Inertia::render('Configurations/VatRates/Create');
     }
 
@@ -46,6 +50,8 @@ class VatRateController extends Controller
      */
     public function store(StoreVatRateRequest $request)
     {
+        $this->checkPermission('vat-rates.create');
+
         VatRate::create($request->validated());
 
         return redirect()->route('vat-rates.index')
@@ -55,9 +61,13 @@ class VatRateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(VatRate $vatRate)
     {
-        //
+        $this->checkPermission('vat-rates.read');
+
+        return Inertia::render('Configurations/VatRates/Show', [
+            'vatRate' => $vatRate,
+        ]);
     }
 
     /**
@@ -65,6 +75,8 @@ class VatRateController extends Controller
      */
     public function edit(VatRate $vatRate)
     {
+        $this->checkPermission('vat-rates.update');
+
         return Inertia::render('Configurations/VatRates/Edit', [
             'vatRate' => $vatRate,
         ]);
@@ -75,6 +87,8 @@ class VatRateController extends Controller
      */
     public function update(UpdateVatRateRequest $request, VatRate $vatRate)
     {
+        $this->checkPermission('vat-rates.update');
+
         $vatRate->update($request->validated());
 
         return redirect()->route('vat-rates.index')
@@ -86,6 +100,8 @@ class VatRateController extends Controller
      */
     public function destroy(VatRate $vatRate)
     {
+        $this->checkPermission('vat-rates.delete');
+
         $vatRate->delete();
 
         return redirect()->route('vat-rates.index')

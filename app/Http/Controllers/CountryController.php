@@ -38,6 +38,8 @@ class CountryController extends Controller
      */
     public function create()
     {
+        $this->checkPermission('countries.create');
+
         return Inertia::render('Configurations/Countries/Create');
     }
 
@@ -46,6 +48,8 @@ class CountryController extends Controller
      */
     public function store(StoreCountryRequest $request)
     {
+        $this->checkPermission('countries.create');
+
         Country::create($request->validated());
 
         return redirect()->route('countries.index')
@@ -55,9 +59,13 @@ class CountryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Country $country)
     {
-        //
+        $this->checkPermission('countries.read');
+
+        return Inertia::render('Configurations/Countries/Show', [
+            'country' => $country,
+        ]);
     }
 
     /**
@@ -65,6 +73,8 @@ class CountryController extends Controller
      */
      public function edit(Country $country)
     {
+        $this->checkPermission('countries.update');
+
         return Inertia::render('Configurations/Countries/Edit', [
             'country' => $country,
         ]);
@@ -75,6 +85,8 @@ class CountryController extends Controller
      */
     public function update(UpdateCountryRequest $request, Country $country)
     {
+        $this->checkPermission('countries.update');
+
         $country->update($request->validated());
 
         return redirect()->route('countries.index')
@@ -86,6 +98,8 @@ class CountryController extends Controller
      */
      public function destroy(Country $country)
     {
+        $this->checkPermission('countries.delete');
+
         $country->delete();
 
         return redirect()->route('countries.index')

@@ -18,6 +18,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierOrderController;
 use App\Http\Controllers\SupplierInvoiceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PermissionGroupController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -87,4 +89,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supplier-invoices/{supplierInvoice}/download-payment-proof', [SupplierInvoiceController::class, 'downloadPaymentProof'])->name('supplier-invoices.download-payment-proof');
 
     Route::resource('users', UserController::class);
+    Route::resource('permission-groups', PermissionGroupController::class);
+    
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });

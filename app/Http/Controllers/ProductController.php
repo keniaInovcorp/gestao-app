@@ -24,6 +24,8 @@ class ProductController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('products.read');
+
         try {
             $products = Product::with('vatRate')
                 ->orderBy('reference')
@@ -50,6 +52,8 @@ class ProductController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('products.create');
+
         return Inertia::render('Configurations/Products/Create', [
             'vatRates' => VatRate::where('status', 'active')->orderBy('percentage')->get(),
         ]);
@@ -63,6 +67,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): RedirectResponse
     {
+        $this->checkPermission('products.create');
         $data = $request->validated();
         
         if ($request->hasFile('photo')) {
@@ -88,6 +93,8 @@ class ProductController extends Controller
      */
     public function show(Product $product): Response
     {
+        $this->checkPermission('products.read');
+
         $product->load('vatRate');
 
         return Inertia::render('Configurations/Products/Show', [
@@ -103,6 +110,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product): Response
     {
+        $this->checkPermission('products.update');
+
         return Inertia::render('Configurations/Products/Edit', [
             'product' => $product->load('vatRate'),
             'vatRates' => VatRate::where('status', 'active')->orderBy('percentage')->get(),
@@ -118,6 +127,8 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
+        $this->checkPermission('products.update');
+
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
@@ -147,6 +158,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): RedirectResponse
     {
+        $this->checkPermission('products.delete');
+
         if ($product->photo && Storage::disk('private')->exists($product->photo)) {
             Storage::disk('private')->delete($product->photo);
         }

@@ -24,6 +24,8 @@ class SupplierInvoiceController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('supplier-invoices.read');
+
         $supplierInvoices = SupplierInvoice::with(['supplier', 'supplierOrder'])
             ->orderBy('invoice_date', 'desc')
             ->orderBy('number', 'desc')
@@ -39,6 +41,8 @@ class SupplierInvoiceController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('supplier-invoices.create');
+
         $suppliers = Entity::where('type', 'supplier')
             ->where('status', 'active')
             ->orderBy('name')
@@ -60,6 +64,8 @@ class SupplierInvoiceController extends Controller
      */
     public function store(StoreSupplierInvoiceRequest $request): RedirectResponse
     {
+        $this->checkPermission('supplier-invoices.create');
+
         $lastInvoice = SupplierInvoice::orderBy('number', 'desc')->first();
         $year = Carbon::now()->format('Y');
         
@@ -100,6 +106,8 @@ class SupplierInvoiceController extends Controller
      */
     public function show(SupplierInvoice $supplierInvoice): Response
     {
+        $this->checkPermission('supplier-invoices.read');
+
         $supplierInvoice->load(['supplier', 'supplierOrder']);
 
         return Inertia::render('SupplierInvoices/Show', [
@@ -137,6 +145,8 @@ class SupplierInvoiceController extends Controller
      */
     public function update(UpdateSupplierInvoiceRequest $request, SupplierInvoice $supplierInvoice): RedirectResponse
     {
+        $this->checkPermission('supplier-invoices.update');
+
         $oldStatus = $supplierInvoice->status;
         
         $validated = $request->validated();
@@ -173,6 +183,8 @@ class SupplierInvoiceController extends Controller
      */
     public function destroy(SupplierInvoice $supplierInvoice): RedirectResponse
     {
+        $this->checkPermission('supplier-invoices.delete');
+
         if ($supplierInvoice->document && Storage::disk('private')->exists($supplierInvoice->document)) {
             Storage::disk('private')->delete($supplierInvoice->document);
         }

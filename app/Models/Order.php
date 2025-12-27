@@ -34,6 +34,14 @@ class Order extends Model
     }
 
     /**
+     * Get the supplier orders that originated from this order.
+     */
+    public function supplierOrders(): HasMany
+    {
+        return $this->hasMany(SupplierOrder::class);
+    }
+
+    /**
      * Get the total amount without VAT.
      */
     public function getTotalAttribute(): float

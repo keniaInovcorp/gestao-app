@@ -6,6 +6,8 @@
                 <h1 class="text-2xl font-bold">Encomendas Fornecedor</h1>
             </div>
 
+            <FlashMessages />
+
             <div v-if="supplierOrders && supplierOrders.data" class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -34,8 +36,20 @@
                                     {{ supplierOrder.status === 'closed' ? 'Fechado' : 'Rascunho' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                                <Link :href="`/supplier-orders/${supplierOrder.id}`" class="text-blue-600 hover:text-blue-900">Ver</Link>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <Link 
+                                        v-if="canRead('supplier-orders')"
+                                        :href="`/supplier-orders/${supplierOrder.id}`" 
+                                        class="text-blue-600 hover:text-blue-900"
+                                        title="Detalhes"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </Link>
+                                </div>
                             </td>
                         </tr>
                         <tr v-else>
@@ -86,7 +100,9 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import FlashMessages from '@/components/FlashMessages.vue';
 import { truncate } from '@/utils/truncate';
+import { usePermissions } from '@/composables/usePermissions';
 
 const props = defineProps({
     supplierOrders: {
@@ -94,6 +110,8 @@ const props = defineProps({
         default: () => ({ data: [] })
     },
 });
+
+const { canRead } = usePermissions();
 
 const formatDate = (date) => {
     if (!date) return '-';
@@ -112,4 +130,3 @@ const calculateTotal = (supplierOrder) => {
     }, 0);
 };
 </script>
-

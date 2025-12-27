@@ -21,6 +21,8 @@ class QuotationController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('quotations.read');
+
         $quotations = Quotation::with(['client', 'lines.product.vatRate'])
             ->orderBy('quotation_date', 'desc')
             ->orderBy('number', 'desc')
@@ -36,6 +38,8 @@ class QuotationController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('quotations.create');
+
         $clients = Entity::where('type', 'client')
             ->where('status', 'active')
             ->orderBy('name')
@@ -63,6 +67,7 @@ class QuotationController extends Controller
      */
     public function store(StoreQuotationRequest $request): RedirectResponse
     {
+        $this->checkPermission('quotations.create');
         $lastQuotation = Quotation::orderBy('number', 'desc')->first();
         $year = Carbon::now()->format('Y');
         
@@ -102,6 +107,8 @@ class QuotationController extends Controller
      */
     public function show(Quotation $quotation): Response
     {
+        $this->checkPermission('quotations.read');
+
         $quotation->load(['client', 'lines.product.vatRate', 'lines.supplier']);
 
         return Inertia::render('Quotations/Show', [
@@ -114,6 +121,8 @@ class QuotationController extends Controller
      */
     public function edit(Quotation $quotation): Response
     {
+        $this->checkPermission('quotations.update');
+
         $quotation->load(['client', 'lines.product.vatRate', 'lines.supplier']);
 
         $clients = Entity::where('type', 'client')
@@ -152,6 +161,8 @@ class QuotationController extends Controller
      */
     public function update(UpdateQuotationRequest $request, Quotation $quotation): RedirectResponse
     {
+        $this->checkPermission('quotations.update');
+
         $quotation->update([
             'quotation_date' => $request->quotation_date,
             'client_id' => $request->client_id,
@@ -180,6 +191,8 @@ class QuotationController extends Controller
      */
     public function destroy(Quotation $quotation): RedirectResponse
     {
+        $this->checkPermission('quotations.delete');
+
         $quotation->delete();
 
         return redirect()->route('quotations.index')
@@ -206,6 +219,8 @@ class QuotationController extends Controller
      */
     public function convertToOrder(Quotation $quotation): RedirectResponse
     {
+        $this->checkPermission('quotations.update');
+
         if ($quotation->status !== 'closed') {
             return redirect()->route('quotations.index')
                 ->with('error', 'Apenas propostas fechadas podem ser convertidas em encomendas');

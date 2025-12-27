@@ -16,6 +16,8 @@ class ContactFunctionController extends Controller
      */
     public function index()
     {
+        $this->checkPermission('contact-functions.read');
+
         try {
             $contactFunctions = ContactFunction::orderBy('name')->paginate(15);
         } catch (\Exception $e) {
@@ -38,6 +40,8 @@ class ContactFunctionController extends Controller
      */
     public function create()
     {
+        $this->checkPermission('contact-functions.create');
+
         return Inertia::render('Configurations/ContactFunctions/Create');
     }
 
@@ -46,6 +50,8 @@ class ContactFunctionController extends Controller
      */
     public function store(StoreContactFunctionRequest $request)
     {
+        $this->checkPermission('contact-functions.create');
+
         ContactFunction::create($request->validated());
 
         return redirect()->route('contact-functions.index')
@@ -55,9 +61,13 @@ class ContactFunctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ContactFunction $contactFunction)
     {
-        //
+        $this->checkPermission('contact-functions.read');
+
+        return Inertia::render('Configurations/ContactFunctions/Show', [
+            'contactFunction' => $contactFunction,
+        ]);
     }
 
     /**
@@ -65,6 +75,8 @@ class ContactFunctionController extends Controller
      */
     public function edit(ContactFunction $contactFunction)
     {
+        $this->checkPermission('contact-functions.update');
+
         return Inertia::render('Configurations/ContactFunctions/Edit', [
             'contactFunction' => $contactFunction,
         ]);
@@ -75,6 +87,8 @@ class ContactFunctionController extends Controller
      */
     public function update(UpdateContactFunctionRequest $request, ContactFunction $contactFunction)
     {
+        $this->checkPermission('contact-functions.update');
+
         $contactFunction->update($request->validated());
 
         return redirect()->route('contact-functions.index')
@@ -86,6 +100,8 @@ class ContactFunctionController extends Controller
      */
     public function destroy(ContactFunction $contactFunction)
     {
+        $this->checkPermission('contact-functions.delete');
+
         $contactFunction->delete();
 
         return redirect()->route('contact-functions.index')

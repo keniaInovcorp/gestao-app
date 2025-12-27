@@ -24,6 +24,8 @@ class OrderController extends Controller
      */
     public function index(): Response
     {
+        $this->checkPermission('orders.read');
+
         $orders = Order::with(['client', 'lines.product.vatRate'])
             ->orderBy('order_date', 'desc')
             ->orderBy('number', 'desc')
@@ -39,6 +41,8 @@ class OrderController extends Controller
      */
     public function create(): Response
     {
+        $this->checkPermission('orders.create');
+
         $clients = Entity::where('type', 'client')
             ->where('status', 'active')
             ->orderBy('name')
@@ -66,6 +70,7 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request): RedirectResponse
     {
+        $this->checkPermission('orders.create');
         $lastOrder = Order::orderBy('number', 'desc')->first();
         $year = Carbon::now()->format('Y');
         
@@ -104,6 +109,8 @@ class OrderController extends Controller
      */
     public function show(Order $order): Response
     {
+        $this->checkPermission('orders.read');
+
         $order->load(['client', 'lines.product.vatRate', 'lines.supplier']);
 
         return Inertia::render('Orders/Show', [
@@ -116,6 +123,8 @@ class OrderController extends Controller
      */
     public function edit(Order $order): Response
     {
+        $this->checkPermission('orders.update');
+
         $order->load(['client', 'lines.product.vatRate', 'lines.supplier']);
 
         $clients = Entity::where('type', 'client')
@@ -154,6 +163,8 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Order $order): RedirectResponse
     {
+        $this->checkPermission('orders.update');
+
         $order->update([
             'order_date' => $request->order_date,
             'client_id' => $request->client_id,
@@ -180,6 +191,14 @@ class OrderController extends Controller
      */
     public function destroy(Order $order): RedirectResponse
     {
+        $this->checkPermission('orders.delete');
+
+        $supplierOrdersCount = $order->supplierOrders()->count();
+        if ($supplierOrdersCount > 0) {
+            return redirect()->route('orders.index')
+                ->with('error', "Não pode eliminar uma encomenda que tem {$supplierOrdersCount} encomenda(s) fornecedor associada(s). Elimine primeiro as encomendas fornecedor.");
+        }
+
         $order->delete();
 
         return redirect()->route('orders.index')
@@ -206,6 +225,8 @@ class OrderController extends Controller
      */
     public function convertToSupplierOrder(Order $order): RedirectResponse
     {
+        $this->checkPermission('orders.update');
+
         if ($order->status !== 'closed') {
             return redirect()->route('orders.index')
                 ->with('error', 'Apenas encomendas fechadas podem ser convertidas em encomendas fornecedor');

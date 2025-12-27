@@ -1,46 +1,44 @@
 <template>
     <AuthenticatedLayout>
-        <Head :title="type === 'client' ? 'Clientes' : 'Fornecedores'" />
+        <Head title="Grupos de Permissões" />
         <div class="py-8">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold">{{ type === 'client' ? 'Clientes' : 'Fornecedores' }}</h1>
+                <h1 class="text-2xl font-bold">Grupos de Permissões</h1>
                 <Link 
-                    v-if="canCreate(resourceName)"
-                    :href="type === 'client' ? '/clients/create' : '/suppliers/create'" 
+                    v-if="canCreate('permission-groups')"
+                    href="/permission-groups/create" 
                     class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                    Adicionar {{ type === 'client' ? 'Cliente' : 'Fornecedor' }}
+                    Adicionar Grupo
                 </Link>
             </div>
 
             <FlashMessages />
 
-            <div v-if="entities && entities.data" class="bg-white rounded-lg shadow overflow-hidden">
+            <div v-if="permissionGroups && permissionGroups.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIF</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telemóvel</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Website</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome do Grupo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Utilizadores Relacionados</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="entities.data.length > 0" v-for="entity in entities.data" :key="entity.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.tax_number) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.name) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.phone || '-') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.mobile || '-') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.website || '-') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ truncate(entity.email || '-') }}</td>
+                        <tr v-for="group in permissionGroups" :key="group.id">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ group.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ group.users_count }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span :class="group.status === 'active' ? 'text-green-600' : 'text-red-600'">
+                                    {{ group.status === 'active' ? 'Ativo' : 'Inativo' }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <div class="flex items-center space-x-2">
                                     <Link 
-                                        v-if="canRead(resourceName)"
-                                        :href="`/entities/${entity.id}`" 
+                                        v-if="canRead('permission-groups')"
+                                        :href="`/permission-groups/${group.id}`" 
                                         class="text-blue-600 hover:text-blue-900"
                                         title="Detalhes"
                                     >
@@ -50,8 +48,8 @@
                                         </svg>
                                     </Link>
                                     <Link 
-                                        v-if="canUpdate(resourceName)"
-                                        :href="`/entities/${entity.id}/edit`" 
+                                        v-if="canUpdate('permission-groups')"
+                                        :href="`/permission-groups/${group.id}/edit`" 
                                         class="text-yellow-600 hover:text-yellow-900"
                                         title="Editar"
                                     >
@@ -60,8 +58,8 @@
                                         </svg>
                                     </Link>
                                     <button
-                                        v-if="canDelete(resourceName)"
-                                        @click="confirmDelete(entity)"
+                                        v-if="canDelete('permission-groups')"
+                                        @click="confirmDelete(group)"
                                         class="text-red-600 hover:text-red-900"
                                         title="Eliminar"
                                     >
@@ -72,17 +70,14 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr v-else>
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                                Nenhum {{ type === 'client' ? 'cliente' : 'fornecedor' }} encontrado. 
-                                <Link v-if="canCreate(resourceName)" :href="type === 'client' ? '/clients/create' : '/suppliers/create'" class="text-blue-600 hover:text-blue-900">Criar o primeiro {{ type === 'client' ? 'cliente' : 'fornecedor' }}</Link>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
             <div v-else class="bg-white rounded-lg shadow p-6">
-                <p class="text-gray-500">Carregando...</p>
+                <p class="text-gray-500 text-center">
+                    Nenhum grupo de permissões encontrado. 
+                    <Link v-if="canCreate('permission-groups')" href="/permission-groups/create" class="text-blue-600 hover:text-blue-900">Criar o primeiro grupo</Link>
+                </p>
             </div>
         </div>
     </AuthenticatedLayout>
@@ -92,27 +87,20 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import FlashMessages from '@/components/FlashMessages.vue';
-import { truncate } from '@/utils/truncate';
 import { usePermissions } from '@/composables/usePermissions';
-import { computed } from 'vue';
 
 const props = defineProps({
-    entities: {
-        type: Object,
-        default: () => ({ data: [] })
+    permissionGroups: {
+        type: Array,
+        default: () => []
     },
-    type: String,
 });
 
 const { canCreate, canRead, canUpdate, canDelete } = usePermissions();
 
-const resourceName = computed(() => {
-    return props.type === 'client' ? 'clients' : 'suppliers';
-});
-
-const confirmDelete = (entity) => {
-    if (confirm(`Tem certeza que deseja eliminar a entidade "${entity.name}"?`)) {
-        router.delete(`/entities/${entity.id}`);
+const confirmDelete = (group) => {
+    if (confirm(`Tem certeza que deseja eliminar o grupo de permissões "${group.name}"?`)) {
+        router.delete(`/permission-groups/${group.id}`);
     }
 };
 </script>

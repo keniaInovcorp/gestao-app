@@ -18,6 +18,10 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         
+        if ($user) {
+            $user->load('roles.permissions');
+        }
+        
         return [
             ...parent::share($request),
             'auth' => [
@@ -26,7 +30,12 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'email' => $user->email,
                     'roles' => $user->roles->pluck('name')->toArray(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                 ] : null,
+            ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
             ],
         ];
     }
