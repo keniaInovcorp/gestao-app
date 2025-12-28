@@ -11,47 +11,35 @@
                 <!-- Informações do Perfil -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold mb-4">Informações do Perfil</h2>
-                    <form @submit="onSubmitProfile">
+                    <form @submit.prevent="onSubmitProfile">
                         <div class="space-y-4">
-                            <FormField v-slot="{ componentField }" name="name">
-                                <FormItem class="space-y-2">
-                                    <FormLabel>Nome</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            v-bind="componentField"
-                                            placeholder="Seu nome"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium">Nome <span class="text-red-500">*</span></label>
+                                <Input
+                                    v-model="profileForm.name"
+                                    placeholder="Seu nome"
+                                />
+                                <p v-if="profileForm.errors.name" class="text-sm text-red-600">{{ profileForm.errors.name }}</p>
+                            </div>
 
-                            <FormField v-slot="{ componentField }" name="email">
-                                <FormItem class="space-y-2">
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            v-bind="componentField"
-                                            type="email"
-                                            placeholder="seu@email.com"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium">Email <span class="text-red-500">*</span></label>
+                                <Input
+                                    v-model="profileForm.email"
+                                    type="email"
+                                    placeholder="seu@email.com"
+                                />
+                                <p v-if="profileForm.errors.email" class="text-sm text-red-600">{{ profileForm.errors.email }}</p>
+                            </div>
 
-                            <FormField v-slot="{ componentField }" name="mobile">
-                                <FormItem class="space-y-2">
-                                    <FormLabel>Telemóvel</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            v-bind="componentField"
-                                            placeholder="+351 912 345 678"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            </FormField>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium">Telemóvel</label>
+                                <Input
+                                    v-model="profileForm.mobile"
+                                    placeholder="+351 912 345 678"
+                                />
+                                <p v-if="profileForm.errors.mobile" class="text-sm text-red-600">{{ profileForm.errors.mobile }}</p>
+                            </div>
 
                             <div class="flex gap-4 pt-4">
                                 <Button
@@ -143,12 +131,6 @@ const props = defineProps({
     user: Object,
 });
 
-const profileSchema = toTypedSchema(z.object({
-    name: z.string().min(1, 'O nome é obrigatório'),
-    email: z.string().email('Email inválido').min(1, 'O email é obrigatório'),
-    mobile: z.string().optional(),
-}));
-
 const passwordSchema = toTypedSchema(z.object({
     current_password: z.string().min(1, 'A password atual é obrigatória'),
     password: z.string().min(8, 'A password deve ter pelo menos 8 caracteres'),
@@ -158,13 +140,10 @@ const passwordSchema = toTypedSchema(z.object({
     path: ['password_confirmation'],
 }));
 
-const { handleSubmit: handleProfileSubmit, setFieldError: setProfileFieldError } = useForm({
-    validationSchema: profileSchema,
-    initialValues: {
-        name: props.user?.name || '',
-        email: props.user?.email || '',
-        mobile: props.user?.mobile || '',
-    },
+const profileForm = useInertiaForm({
+    name: props.user?.name || '',
+    email: props.user?.email || '',
+    mobile: props.user?.mobile || '',
 });
 
 const { handleSubmit: handlePasswordSubmit, setFieldError: setPasswordFieldError } = useForm({
@@ -176,34 +155,20 @@ const { handleSubmit: handlePasswordSubmit, setFieldError: setPasswordFieldError
     },
 });
 
-const profileForm = useInertiaForm({
-    name: props.user?.name || '',
-    email: props.user?.email || '',
-    mobile: props.user?.mobile || '',
-});
-
 const passwordForm = useInertiaForm({
     current_password: '',
     password: '',
     password_confirmation: '',
 });
 
-const onSubmitProfile = handleProfileSubmit((values) => {
-    profileForm.name = values.name;
-    profileForm.email = values.email;
-    profileForm.mobile = values.mobile || '';
-    
+const onSubmitProfile = () => {
     profileForm.put('/profile', {
+        preserveScroll: true,
         onSuccess: () => {
-            router.reload({ only: ['user'] });
-        },
-        onError: (errors) => {
-            Object.keys(errors).forEach((field) => {
-                setProfileFieldError(field, errors[field]);
-            });
+            router.reload({ only: ['auth', 'user'] });
         },
     });
-});
+};
 
 const onSubmitPassword = handlePasswordSubmit((values) => {
     passwordForm.current_password = values.current_password;

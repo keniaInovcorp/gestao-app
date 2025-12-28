@@ -30,10 +30,16 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        $updater->update($user, $request->all());
-
-        return redirect()->route('profile.edit')
-            ->with('success', 'Perfil atualizado com sucesso');
+        try {
+            $updater->update($user, $request->all());
+            
+            return redirect()->route('profile.edit')
+                ->with('success', 'Perfil atualizado com sucesso');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->route('profile.edit')
+                ->withErrors($e->errors(), 'updateProfileInformation')
+                ->withInput();
+        }
     }
 
     public function updatePassword(Request $request, UpdateUserPassword $updater): RedirectResponse
