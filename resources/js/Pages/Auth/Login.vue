@@ -2,6 +2,13 @@
     <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div>
+                <div v-if="company?.has_logo" class="flex justify-center mb-6">
+                    <img 
+                        src="/company/logo" 
+                        :alt="company?.name || 'Logo'" 
+                        class="h-20 w-auto object-contain"
+                    />
+                </div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Entrar na sua conta
                 </h2>
@@ -52,7 +59,11 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+const company = computed(() => page.props.company);
 
 const form = useForm({
     email: '',

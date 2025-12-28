@@ -213,10 +213,30 @@
 <body>
     <div class="header">
         <div class="logo-section">
-            <div class="logo-box">GA</div>
+            @if($company && $company->logo)
+                @php
+                    $logoPath = storage_path('app/private/' . $company->logo);
+                    $logoData = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
+                    $logoMime = mime_content_type($logoPath);
+                @endphp
+                @if($logoData)
+                    <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Logo" style="max-height: 60px; max-width: 200px; object-fit: contain;" />
+                @else
+                    <div class="logo-box">{{ substr($company->name ?? 'GA', 0, 2) }}</div>
+                @endif
+            @else
+                <div class="logo-box">GA</div>
+            @endif
             <div class="company-name-section">
-                <div class="company-name-main">GESTAO-APP</div>
+                <div class="company-name-main">{{ $company->name ?? 'GESTAO-APP' }}</div>
+                @if($company && $company->address)
+                <div class="company-name-sub">
+                    {{ $company->address }}<br>
+                    {{ $company->postal_code }} {{ $company->city }}
+                </div>
+                @else
                 <div class="company-name-sub">Sistema de Gestão</div>
+                @endif
             </div>
         </div>
         <div class="document-header-right">
@@ -349,12 +369,18 @@
         <div class="footer-left">
             <div class="footer-title">Contactos</div>
             <div class="footer-contact">
-                Rua António Saúde SB<br>
-                1500-048 Lisboa<br>
-                T 217 710 850 (chamada para a rede fixa nacional)<br>
-                M 911 898 899 (chamada para a rede móvel nacional)<br>
-                geral@gestaoapp.com<br>
-                www.gestaoapp.com
+                @if($company)
+                    @if($company->address){{ $company->address }}<br>@endif
+                    @if($company->postal_code && $company->city){{ $company->postal_code }} {{ $company->city }}<br>@endif
+                    @if($company->tax_number)Contribuinte: {{ $company->tax_number }}<br>@endif
+                @else
+                    Rua António Saúde SB<br>
+                    1500-048 Lisboa<br>
+                    T 217 710 850 (chamada para a rede fixa nacional)<br>
+                    M 911 898 899 (chamada para a rede móvel nacional)<br>
+                    geral@gestaoapp.com<br>
+                    www.gestaoapp.com
+                @endif
             </div>
         </div>
         <div class="footer-right">

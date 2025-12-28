@@ -192,9 +192,28 @@
 <body>
     <div class="header">
         <div class="logo-section">
-            <div class="logo-box">GA</div>
+            @if($company && $company->logo)
+                @php
+                    $logoPath = storage_path('app/private/' . $company->logo);
+                    $logoData = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
+                    $logoMime = mime_content_type($logoPath);
+                @endphp
+                @if($logoData)
+                    <img src="data:{{ $logoMime }};base64,{{ $logoData }}" alt="Logo" style="max-height: 60px; max-width: 200px; object-fit: contain;" />
+                @else
+                    <div class="logo-box">{{ substr($company->name ?? 'GA', 0, 2) }}</div>
+                @endif
+            @else
+                <div class="logo-box">GA</div>
+            @endif
             <div class="company-name-section">
-                <div class="company-name-main">GESTAO-APP</div>
+                <div class="company-name-main">{{ $company->name ?? 'GESTAO-APP' }}</div>
+                @if($company && $company->address)
+                <div class="company-name-sub">
+                    {{ $company->address }}<br>
+                    {{ $company->postal_code }} {{ $company->city }}
+                </div>
+                @endif
             </div>
         </div>
         <div class="document-header-right">

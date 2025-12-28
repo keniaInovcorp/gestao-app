@@ -206,8 +206,11 @@ class QuotationController extends Controller
     {
         $quotation->load(['client.country', 'lines.product.vatRate', 'lines.supplier']);
 
+        $company = \App\Models\Company::first();
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('quotations.pdf', [
             'quotation' => $quotation,
+            'company' => $company,
         ]);
 
         $filename = 'proposta-' . str_replace(['/', '\\'], '-', $quotation->number) . '.pdf';

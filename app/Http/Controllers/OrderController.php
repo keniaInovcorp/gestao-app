@@ -212,8 +212,11 @@ class OrderController extends Controller
     {
         $order->load(['client.country', 'lines.product.vatRate', 'lines.supplier']);
 
+        $company = \App\Models\Company::first();
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('orders.pdf', [
             'order' => $order,
+            'company' => $company,
         ]);
 
         $filename = 'encomenda-' . str_replace(['/', '\\'], '-', $order->number) . '.pdf';
@@ -323,9 +326,12 @@ class OrderController extends Controller
     {
         $supplierInvoice->load(['supplier.country', 'supplierOrder.lines.product.vatRate']);
 
+        $company = \App\Models\Company::first();
+
         try {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('supplier-invoices.pdf', [
                 'invoice' => $supplierInvoice,
+                'company' => $company,
             ]);
 
             $filename = 'fatura-' . str_replace(['/', '\\'], '-', $supplierInvoice->number) . '.pdf';

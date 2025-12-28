@@ -21,6 +21,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\CompanyController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -28,6 +29,8 @@ Route::get('/', function () {
     }
     return Inertia::render('Welcome');
 });
+
+Route::get('/company/logo', [CompanyController::class, 'logo'])->name('company.logo');
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -93,6 +96,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('permission-groups', PermissionGroupController::class);
     
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+    
+    Route::get('/company/edit', [CompanyController::class, 'edit'])->name('company.edit');
+    Route::put('/company', [CompanyController::class, 'update'])->name('company.update');
+    Route::post('/company', [CompanyController::class, 'update'])->name('company.update.post');
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
