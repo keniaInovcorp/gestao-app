@@ -22,6 +22,9 @@ use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CalendarTypeController;
+use App\Http\Controllers\CalendarActionController;
+use App\Http\Controllers\CalendarEventController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -49,6 +52,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('countries', CountryController::class);
     Route::resource('contact-functions', ContactFunctionController::class);
+    Route::resource('calendar-types', CalendarTypeController::class);
+    Route::resource('calendar-actions', CalendarActionController::class);
+    Route::resource('calendar-events', CalendarEventController::class);
     Route::resource('vat-rates', VatRateController::class);
     Route::resource('products', ProductController::class);
     Route::get('/products/{product}/photo', [ProductController::class, 'photo'])->name('products.photo');
@@ -104,4 +110,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calendar.index');
 });

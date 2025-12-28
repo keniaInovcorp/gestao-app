@@ -217,11 +217,15 @@ class PermissionGroupController extends Controller
             'contacts' => 'Contactos',
             'products' => 'Artigos',
             'quotations' => 'Propostas',
+            'calendar-events' => 'Calendário',
             'orders' => 'Encomendas - Clientes',
             'supplier-orders' => 'Encomendas - Fornecedores',
             'supplier-invoices' => 'Faturas Fornecedor',
+            'calendar-types' => 'Calendário - Tipos',
+            'calendar-actions' => 'Calendário - Acções',
             'users' => 'Utilizadores',
             'permission-groups' => 'Permissões',
+            'logs' => 'Logs',
         ];
     }
 }

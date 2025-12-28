@@ -96,6 +96,21 @@
                         </Link>
                     </li>
 
+                    <li v-if="hasPermission('calendar-events.read')">
+                        <Link
+                            href="/calendar"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors"
+                            :class="isActive('/calendar') 
+                                ? 'bg-gray-900 text-white' 
+                                : 'text-gray-700 hover:bg-gray-100'"
+                        >
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Calendário
+                        </Link>
+                    </li>
+
                     <li v-if="hasPermission('orders.read')">
                         <Link
                             href="/orders"
@@ -216,6 +231,36 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                             Funções de Contacto
+                        </Link>
+                    </li>
+
+                    <li v-if="hasPermission('products.read')">
+                        <Link
+                            href="/calendar-types"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ml-2"
+                            :class="isActive('/calendar-types') 
+                                ? 'bg-gray-900 text-white' 
+                                : 'text-gray-700 hover:bg-gray-100'"
+                        >
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            Calendário - Tipos
+                        </Link>
+                    </li>
+
+                    <li v-if="hasPermission('products.read')">
+                        <Link
+                            href="/calendar-actions"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ml-2"
+                            :class="isActive('/calendar-actions') 
+                                ? 'bg-gray-900 text-white' 
+                                : 'text-gray-700 hover:bg-gray-100'"
+                        >
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Calendário - Acções
                         </Link>
                     </li>
 
