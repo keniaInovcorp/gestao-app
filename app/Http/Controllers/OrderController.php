@@ -100,6 +100,8 @@ class OrderController extends Controller
             ]);
         }
 
+        $this->logActivity($order, 'created', 'order', $request);
+
         return redirect()->route('orders.index')
             ->with('success', 'Encomenda criada com sucesso');
     }
@@ -112,6 +114,7 @@ class OrderController extends Controller
         $this->checkPermission('orders.read');
 
         $order->load(['client', 'lines.product.vatRate', 'lines.supplier']);
+        $this->logActivity($order, 'viewed', 'order', request());
 
         return Inertia::render('Orders/Show', [
             'order' => $order,
@@ -190,6 +193,8 @@ class OrderController extends Controller
             ]);
         }
 
+        $this->logActivity($order, 'updated', 'order', $request);
+
         return redirect()->route('orders.index')
             ->with('success', 'Encomenda atualizada com sucesso');
     }
@@ -207,7 +212,9 @@ class OrderController extends Controller
                 ->with('error', "Não pode eliminar uma encomenda que tem {$supplierOrdersCount} encomenda(s) fornecedor associada(s). Elimine primeiro as encomendas fornecedor.");
         }
 
+        $orderNumber = $order->number;
         $order->delete();
+        $this->logActivity(null, 'deleted', 'order', request(), "Deleted order {$orderNumber}");
 
         return redirect()->route('orders.index')
             ->with('success', 'Encomenda eliminada com sucesso');

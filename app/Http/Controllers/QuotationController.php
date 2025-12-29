@@ -98,6 +98,8 @@ class QuotationController extends Controller
             ]);
         }
 
+        $this->logActivity($quotation, 'created', 'quotation', $request);
+
         return redirect()->route('quotations.index')
             ->with('success', 'Proposta criada com sucesso');
     }
@@ -110,6 +112,7 @@ class QuotationController extends Controller
         $this->checkPermission('quotations.read');
 
         $quotation->load(['client', 'lines.product.vatRate', 'lines.supplier']);
+        $this->logActivity($quotation, 'viewed', 'quotation', request());
 
         return Inertia::render('Quotations/Show', [
             'quotation' => $quotation,
@@ -190,6 +193,8 @@ class QuotationController extends Controller
             ]);
         }
 
+        $this->logActivity($quotation, 'updated', 'quotation', $request);
+
         return redirect()->route('quotations.index')
             ->with('success', 'Proposta atualizada com sucesso');
     }
@@ -201,7 +206,9 @@ class QuotationController extends Controller
     {
         $this->checkPermission('quotations.delete');
 
+        $quotationNumber = $quotation->number;
         $quotation->delete();
+        $this->logActivity(null, 'deleted', 'quotation', request(), "Deleted quotation {$quotationNumber}");
 
         return redirect()->route('quotations.index')
             ->with('success', 'Proposta eliminada com sucesso');

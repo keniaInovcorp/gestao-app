@@ -11,6 +11,10 @@ class Product extends Model
         'reference', 'name', 'description', 'price', 'vat_rate_id', 'photo', 'notes', 'status'
     ];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
     /**
      * Get the VAT rate that owns the product.
      *

@@ -182,7 +182,7 @@ const schema = toTypedSchema(z.object({
     reference: z.string().min(1, 'A referência é obrigatória'),
     name: z.string().min(1, 'O nome é obrigatório'),
     description: z.string().optional(),
-    price: z.number().min(0, 'O preço não pode ser negativo'),
+    price: z.coerce.number().min(0, 'O preço não pode ser negativo'),
     vat_rate_id: z.string().min(1, 'A taxa de IVA é obrigatória'),
     notes: z.string().optional(),
     status: z.enum(['active', 'inactive']),

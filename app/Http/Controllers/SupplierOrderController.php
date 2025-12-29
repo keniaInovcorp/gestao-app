@@ -34,6 +34,7 @@ class SupplierOrderController extends Controller
         $this->checkPermission('supplier-orders.read');
 
         $supplierOrder->load(['supplier', 'order.client', 'lines.product']);
+        $this->logActivity($supplierOrder, 'viewed', 'supplier-order', request());
 
         return Inertia::render('SupplierOrders/Show', [
             'supplierOrder' => $supplierOrder,

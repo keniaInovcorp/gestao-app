@@ -50,7 +50,8 @@ class CountryController extends Controller
     {
         $this->checkPermission('countries.create');
 
-        Country::create($request->validated());
+        $country = Country::create($request->validated());
+        $this->logActivity($country, 'created', 'country', $request);
 
         return redirect()->route('countries.index')
             ->with('success', 'País criado com sucesso');
@@ -62,6 +63,8 @@ class CountryController extends Controller
     public function show(Country $country)
     {
         $this->checkPermission('countries.read');
+
+        $this->logActivity($country, 'viewed', 'country', request());
 
         return Inertia::render('Configurations/Countries/Show', [
             'country' => $country,
@@ -88,6 +91,7 @@ class CountryController extends Controller
         $this->checkPermission('countries.update');
 
         $country->update($request->validated());
+        $this->logActivity($country, 'updated', 'country', $request);
 
         return redirect()->route('countries.index')
             ->with('success', 'País atualizado com sucesso');
@@ -100,7 +104,9 @@ class CountryController extends Controller
     {
         $this->checkPermission('countries.delete');
 
+        $countryName = $country->name;
         $country->delete();
+        $this->logActivity(null, 'deleted', 'country', request(), "Deleted country {$countryName}");
 
         return redirect()->route('countries.index')
             ->with('success', 'País eliminado com sucesso');

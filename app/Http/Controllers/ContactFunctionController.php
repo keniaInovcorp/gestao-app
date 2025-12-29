@@ -52,7 +52,8 @@ class ContactFunctionController extends Controller
     {
         $this->checkPermission('contact-functions.create');
 
-        ContactFunction::create($request->validated());
+        $contactFunction = ContactFunction::create($request->validated());
+        $this->logActivity($contactFunction, 'created', 'contact-function', $request);
 
         return redirect()->route('contact-functions.index')
             ->with('success', 'Função criada com sucesso');
@@ -64,6 +65,8 @@ class ContactFunctionController extends Controller
     public function show(ContactFunction $contactFunction)
     {
         $this->checkPermission('contact-functions.read');
+
+        $this->logActivity($contactFunction, 'viewed', 'contact-function', request());
 
         return Inertia::render('Configurations/ContactFunctions/Show', [
             'contactFunction' => $contactFunction,
@@ -90,6 +93,7 @@ class ContactFunctionController extends Controller
         $this->checkPermission('contact-functions.update');
 
         $contactFunction->update($request->validated());
+        $this->logActivity($contactFunction, 'updated', 'contact-function', $request);
 
         return redirect()->route('contact-functions.index')
             ->with('success', 'Função atualizada com sucesso');
@@ -102,7 +106,9 @@ class ContactFunctionController extends Controller
     {
         $this->checkPermission('contact-functions.delete');
 
+        $functionName = $contactFunction->name;
         $contactFunction->delete();
+        $this->logActivity(null, 'deleted', 'contact-function', request(), "Deleted contact-function {$functionName}");
 
         return redirect()->route('contact-functions.index')
             ->with('success', 'Função eliminada com sucesso');

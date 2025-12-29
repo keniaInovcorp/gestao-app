@@ -52,7 +52,8 @@ class VatRateController extends Controller
     {
         $this->checkPermission('vat-rates.create');
 
-        VatRate::create($request->validated());
+        $vatRate = VatRate::create($request->validated());
+        $this->logActivity($vatRate, 'created', 'vat-rate', $request);
 
         return redirect()->route('vat-rates.index')
             ->with('success', 'Taxa de IVA criada com sucesso');
@@ -64,6 +65,8 @@ class VatRateController extends Controller
     public function show(VatRate $vatRate)
     {
         $this->checkPermission('vat-rates.read');
+
+        $this->logActivity($vatRate, 'viewed', 'vat-rate', request());
 
         return Inertia::render('Configurations/VatRates/Show', [
             'vatRate' => $vatRate,
@@ -90,6 +93,7 @@ class VatRateController extends Controller
         $this->checkPermission('vat-rates.update');
 
         $vatRate->update($request->validated());
+        $this->logActivity($vatRate, 'updated', 'vat-rate', $request);
 
         return redirect()->route('vat-rates.index')
             ->with('success', 'Taxa de IVA atualizada com sucesso');
@@ -102,7 +106,16 @@ class VatRateController extends Controller
     {
         $this->checkPermission('vat-rates.delete');
 
+        $productsCount = $vatRate->products()->count();
+        
+        if ($productsCount > 0) {
+            return redirect()->route('vat-rates.index')
+                ->with('error', "Não é possível eliminar esta taxa de IVA porque está a ser utilizada em {$productsCount} artigo(s). Remova primeiro a taxa dos artigos.");
+        }
+
+        $vatRateName = $vatRate->name;
         $vatRate->delete();
+        $this->logActivity(null, 'deleted', 'vat-rate', request(), "Deleted vat-rate {$vatRateName}");
 
         return redirect()->route('vat-rates.index')
             ->with('success', 'Taxa de IVA eliminada com sucesso');

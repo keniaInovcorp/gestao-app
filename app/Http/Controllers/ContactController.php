@@ -59,7 +59,7 @@ class ContactController extends Controller
         $lastContact = Contact::orderBy('number', 'desc')->first();
         $nextNumber = $lastContact ? (int)$lastContact->number + 1 : 1;
 
-        Contact::create([
+        $contact = Contact::create([
             'number' => str_pad($nextNumber, 6, '0', STR_PAD_LEFT),
             'entity_id' => $request->entity_id,
             'first_name' => $request->first_name,
@@ -72,6 +72,7 @@ class ContactController extends Controller
             'notes' => $request->notes,
             'status' => $request->status,
         ]);
+        $this->logActivity($contact, 'created', 'contact', $request);
 
         return redirect()->route('contacts.index')
             ->with('success', 'Contacto criado com sucesso');
@@ -88,6 +89,7 @@ class ContactController extends Controller
         $this->checkPermission('contacts.read');
 
         $contact->load(['entity', 'contactFunction']);
+        $this->logActivity($contact, 'viewed', 'contact', request());
 
         return Inertia::render('Contacts/Show', [
             'contact' => $contact,
@@ -126,6 +128,7 @@ class ContactController extends Controller
         unset($data['gdpr_consent']);
         
         $contact->update($data);
+        $this->logActivity($contact, 'updated', 'contact', $request);
 
         return redirect()->route('contacts.index')
             ->with('success', 'Contacto atualizado com sucesso');
@@ -141,7 +144,9 @@ class ContactController extends Controller
     {
         $this->checkPermission('contacts.delete');
 
+        $contactName = $contact->first_name . ' ' . $contact->last_name;
         $contact->delete();
+        $this->logActivity(null, 'deleted', 'contact', request(), "Deleted contact {$contactName}");
 
         return redirect()->route('contacts.index')
             ->with('success', 'Contacto eliminado com sucesso');

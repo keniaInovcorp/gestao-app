@@ -107,6 +107,7 @@ class UserController extends Controller
         $resetUrl = url('/reset-password/' . $token . '?email=' . urlencode($user->email));
 
         Mail::to($user->email)->send(new UserPasswordSetup($user, $resetUrl));
+        $this->logActivity($user, 'created', 'user', $request);
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador criado com sucesso. Email de definição de password enviado.');
@@ -120,6 +121,7 @@ class UserController extends Controller
         $this->checkPermission('users.read');
 
         $user->load('roles');
+        $this->logActivity($user, 'viewed', 'user', request());
 
         return Inertia::render('Users/Show', [
             'user' => $user,
@@ -181,6 +183,7 @@ class UserController extends Controller
         
         $user->syncRoles($rolesToAssign);
         $user->refresh();
+        $this->logActivity($user, 'updated', 'user', $request);
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador atualizado com sucesso');
@@ -198,7 +201,9 @@ class UserController extends Controller
                 ->with('error', 'Não pode eliminar o seu próprio utilizador');
         }
 
+        $userName = $user->name;
         $user->delete();
+        $this->logActivity(null, 'deleted', 'user', request(), "Deleted user {$userName}");
 
         return redirect()->route('users.index')
             ->with('success', 'Utilizador eliminado com sucesso');

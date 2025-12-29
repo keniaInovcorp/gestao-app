@@ -96,6 +96,7 @@ class SupplierInvoiceController extends Controller
         }
 
         $invoice = SupplierInvoice::create($data);
+        $this->logActivity($invoice, 'created', 'supplier-invoice', $request);
 
         return redirect()->route('supplier-invoices.index')
             ->with('success', 'Fatura criada com sucesso');
@@ -109,6 +110,7 @@ class SupplierInvoiceController extends Controller
         $this->checkPermission('supplier-invoices.read');
 
         $supplierInvoice->load(['supplier', 'supplierOrder']);
+        $this->logActivity($supplierInvoice, 'viewed', 'supplier-invoice', request());
 
         return Inertia::render('SupplierInvoices/Show', [
             'supplierInvoice' => $supplierInvoice,
@@ -165,6 +167,7 @@ class SupplierInvoiceController extends Controller
         }
 
         $supplierInvoice->update($data);
+        $this->logActivity($supplierInvoice, 'updated', 'supplier-invoice', $request);
 
         $supplierInvoice->refresh();
 
@@ -192,7 +195,9 @@ class SupplierInvoiceController extends Controller
             Storage::disk('private')->delete($supplierInvoice->payment_proof);
         }
 
+        $invoiceNumber = $supplierInvoice->number;
         $supplierInvoice->delete();
+        $this->logActivity(null, 'deleted', 'supplier-invoice', request(), "Deleted supplier-invoice {$invoiceNumber}");
 
         return redirect()->route('supplier-invoices.index')
             ->with('success', 'Fatura eliminada com sucesso');

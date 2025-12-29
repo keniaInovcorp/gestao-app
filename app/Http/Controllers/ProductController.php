@@ -79,7 +79,8 @@ class ProductController extends Controller
             unset($data['photo']);
         }
 
-        Product::create($data);
+        $product = Product::create($data);
+        $this->logActivity($product, 'created', 'product', $request);
 
         return redirect()->route('products.index')
             ->with('success', 'Artigo criado com sucesso');
@@ -96,6 +97,7 @@ class ProductController extends Controller
         $this->checkPermission('products.read');
 
         $product->load('vatRate');
+        $this->logActivity($product, 'viewed', 'product', request());
 
         return Inertia::render('Configurations/Products/Show', [
             'product' => $product,
@@ -145,6 +147,7 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+        $this->logActivity($product, 'updated', 'product', $request);
 
         return redirect()->route('products.index')
             ->with('success', 'Artigo atualizado com sucesso');
@@ -164,7 +167,9 @@ class ProductController extends Controller
             Storage::disk('private')->delete($product->photo);
         }
 
+        $productName = $product->name;
         $product->delete();
+        $this->logActivity(null, 'deleted', 'product', request(), "Deleted product {$productName}");
 
         return redirect()->route('products.index')
             ->with('success', 'Artigo eliminado com sucesso');
