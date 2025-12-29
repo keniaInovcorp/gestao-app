@@ -14,7 +14,7 @@ class Product extends Model
     /**
      * Get the VAT rate that owns the product.
      *
-     * @return BelongsTo
+     * @return BelongsTo<Product, VatRate>
      */
     public function vatRate(): BelongsTo
     {

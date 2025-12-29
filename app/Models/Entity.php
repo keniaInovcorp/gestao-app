@@ -58,7 +58,7 @@ class Entity extends Model
     /**
      * Get the country that owns the entity.
      *
-     * @return BelongsTo
+     * @return BelongsTo<Entity, Country>
      */
     public function country(): BelongsTo
     {
@@ -67,6 +67,8 @@ class Entity extends Model
 
     /**
      * Get the contacts for the entity.
+     *
+     * @return HasMany<Contact>
      */
     public function contacts(): HasMany
     {
@@ -75,6 +77,8 @@ class Entity extends Model
 
     /**
      * Get the orders where this entity is the client.
+     *
+     * @return HasMany<Order>
      */
     public function ordersAsClient(): HasMany
     {
@@ -83,6 +87,8 @@ class Entity extends Model
 
     /**
      * Get the quotations where this entity is the client.
+     *
+     * @return HasMany<Quotation>
      */
     public function quotationsAsClient(): HasMany
     {
@@ -91,6 +97,8 @@ class Entity extends Model
 
     /**
      * Get the order lines where this entity is the supplier.
+     *
+     * @return HasMany<OrderLine>
      */
     public function orderLinesAsSupplier(): HasMany
     {
@@ -99,6 +107,8 @@ class Entity extends Model
 
     /**
      * Get the quotation lines where this entity is the supplier.
+     *
+     * @return HasMany<QuotationLine>
      */
     public function quotationLinesAsSupplier(): HasMany
     {
@@ -107,6 +117,8 @@ class Entity extends Model
 
     /**
      * Get the supplier orders where this entity is the supplier.
+     *
+     * @return HasMany<SupplierOrder>
      */
     public function supplierOrders(): HasMany
     {
@@ -115,6 +127,8 @@ class Entity extends Model
 
     /**
      * Get the supplier invoices where this entity is the supplier.
+     *
+     * @return HasMany<SupplierInvoice>
      */
     public function supplierInvoices(): HasMany
     {

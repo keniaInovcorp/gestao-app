@@ -18,6 +18,8 @@ class SupplierOrder extends Model
 
     /**
      * Get the supplier entity that owns the order.
+     *
+     * @return BelongsTo<SupplierOrder, Entity>
      */
     public function supplier(): BelongsTo
     {
@@ -26,6 +28,8 @@ class SupplierOrder extends Model
 
     /**
      * Get the customer order that originated this supplier order.
+     *
+     * @return BelongsTo<SupplierOrder, Order>
      */
     public function order(): BelongsTo
     {
@@ -34,6 +38,8 @@ class SupplierOrder extends Model
 
     /**
      * Get the supplier order lines for the order.
+     *
+     * @return HasMany<SupplierOrderLine>
      */
     public function lines(): HasMany
     {
@@ -42,6 +48,8 @@ class SupplierOrder extends Model
 
     /**
      * Get the total amount without VAT.
+     *
+     * @return float
      */
     public function getTotalAttribute(): float
     {

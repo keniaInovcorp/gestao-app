@@ -19,6 +19,8 @@ class QuotationLine extends Model
 
     /**
      * Get the quotation that owns the line.
+     *
+     * @return BelongsTo<QuotationLine, Quotation>
      */
     public function quotation(): BelongsTo
     {
@@ -27,6 +29,8 @@ class QuotationLine extends Model
 
     /**
      * Get the product for the line.
+     *
+     * @return BelongsTo<QuotationLine, Product>
      */
     public function product(): BelongsTo
     {
@@ -35,6 +39,8 @@ class QuotationLine extends Model
 
     /**
      * Get the supplier entity for the line.
+     *
+     * @return BelongsTo<QuotationLine, Entity>
      */
     public function supplier(): BelongsTo
     {
@@ -43,6 +49,8 @@ class QuotationLine extends Model
 
     /**
      * Get the subtotal for the line (quantity * unit_price).
+     *
+     * @return float
      */
     public function getSubtotalAttribute(): float
     {

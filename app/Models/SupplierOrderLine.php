@@ -18,6 +18,8 @@ class SupplierOrderLine extends Model
 
     /**
      * Get the supplier order that owns the line.
+     *
+     * @return BelongsTo<SupplierOrderLine, SupplierOrder>
      */
     public function supplierOrder(): BelongsTo
     {
@@ -26,6 +28,8 @@ class SupplierOrderLine extends Model
 
     /**
      * Get the product for the line.
+     *
+     * @return BelongsTo<SupplierOrderLine, Product>
      */
     public function product(): BelongsTo
     {
@@ -34,6 +38,8 @@ class SupplierOrderLine extends Model
 
     /**
      * Get the subtotal for the line (quantity * unit_price).
+     *
+     * @return float
      */
     public function getSubtotalAttribute(): float
     {

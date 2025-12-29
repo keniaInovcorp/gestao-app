@@ -56,7 +56,7 @@ class Contact extends Model
     /**
      * Get the entity that owns the contact.
      *
-     * @return BelongsTo
+     * @return BelongsTo<Contact, Entity>
      */
     public function entity(): BelongsTo
     {
@@ -66,7 +66,7 @@ class Contact extends Model
     /**
      * Get the contact function that owns the contact.
      *
-     * @return BelongsTo
+     * @return BelongsTo<Contact, ContactFunction>
      */
     public function contactFunction(): BelongsTo
     {

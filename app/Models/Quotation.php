@@ -19,6 +19,8 @@ class Quotation extends Model
 
     /**
      * Get the client entity that owns the quotation.
+     *
+     * @return BelongsTo<Quotation, Entity>
      */
     public function client(): BelongsTo
     {
@@ -27,6 +29,8 @@ class Quotation extends Model
 
     /**
      * Get the quotation lines for the quotation.
+     *
+     * @return HasMany<QuotationLine>
      */
     public function lines(): HasMany
     {
@@ -35,6 +39,8 @@ class Quotation extends Model
 
     /**
      * Get the total amount without VAT.
+     *
+     * @return float
      */
     public function getTotalAttribute(): float
     {
@@ -45,6 +51,8 @@ class Quotation extends Model
 
     /**
      * Get the total amount with VAT included.
+     *
+     * @return float
      */
     public function getTotalWithVatAttribute(): float
     {

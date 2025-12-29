@@ -19,6 +19,8 @@ class Order extends Model
 
     /**
      * Get the client entity that owns the order.
+     *
+     * @return BelongsTo<Order, Entity>
      */
     public function client(): BelongsTo
     {
@@ -27,6 +29,8 @@ class Order extends Model
 
     /**
      * Get the order lines for the order.
+     *
+     * @return HasMany<OrderLine>
      */
     public function lines(): HasMany
     {
@@ -35,6 +39,8 @@ class Order extends Model
 
     /**
      * Get the supplier orders that originated from this order.
+     *
+     * @return HasMany<SupplierOrder>
      */
     public function supplierOrders(): HasMany
     {
@@ -43,6 +49,8 @@ class Order extends Model
 
     /**
      * Get the total amount without VAT.
+     *
+     * @return float
      */
     public function getTotalAttribute(): float
     {
@@ -53,6 +61,8 @@ class Order extends Model
 
     /**
      * Get the total amount with VAT included.
+     *
+     * @return float
      */
     public function getTotalWithVatAttribute(): float
     {

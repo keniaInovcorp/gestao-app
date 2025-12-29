@@ -54,6 +54,11 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get and set encrypted mobile attribute.
+     *
+     * @return Attribute
+     */
     protected function mobile(): Attribute
     {
         return Attribute::make(
@@ -62,6 +67,11 @@ class User extends Authenticatable
         );
     }
 
+    /**
+     * Check if the user is active.
+     *
+     * @return bool
+     */
     public function isActive(): bool
     {
         return $this->status === 'active';

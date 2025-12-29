@@ -19,6 +19,8 @@ class SupplierInvoice extends Model
 
     /**
      * Get the supplier entity that owns the invoice.
+     *
+     * @return BelongsTo<SupplierInvoice, Entity>
      */
     public function supplier(): BelongsTo
     {
@@ -27,6 +29,8 @@ class SupplierInvoice extends Model
 
     /**
      * Get the supplier order related to this invoice.
+     *
+     * @return BelongsTo<SupplierInvoice, SupplierOrder>
      */
     public function supplierOrder(): BelongsTo
     {
