@@ -157,13 +157,27 @@ class SupplierInvoiceController extends Controller
         ];
 
         if ($request->hasFile('payment_proof')) {
-            if ($supplierInvoice->payment_proof && Storage::disk('private')->exists($supplierInvoice->payment_proof)) {
-                Storage::disk('private')->delete($supplierInvoice->payment_proof);
+            try {
+                if ($supplierInvoice->payment_proof && Storage::disk('private')->exists($supplierInvoice->payment_proof)) {
+                    Storage::disk('private')->delete($supplierInvoice->payment_proof);
+                }
+                $paymentProof = $request->file('payment_proof');
+                
+                // Check if file is valid
+                if (!$paymentProof->isValid()) {
+                    return redirect()->back()
+                        ->withErrors(['payment_proof' => 'O arquivo enviado não é válido.'])
+                        ->withInput();
+                }
+                
+                $filename = time() . '_' . uniqid() . '.' . $paymentProof->getClientOriginalExtension();
+                $path = $paymentProof->storeAs('faturas-fornecedor', $filename, 'private');
+                $data['payment_proof'] = $path;
+            } catch (\Exception $e) {
+                return redirect()->back()
+                    ->withErrors(['payment_proof' => 'Erro ao fazer upload do arquivo: ' . $e->getMessage()])
+                    ->withInput();
             }
-            $paymentProof = $request->file('payment_proof');
-            $filename = time() . '_' . uniqid() . '.' . $paymentProof->getClientOriginalExtension();
-            $path = $paymentProof->storeAs('faturas-fornecedor', $filename, 'private');
-            $data['payment_proof'] = $path;
         }
 
         $supplierInvoice->update($data);

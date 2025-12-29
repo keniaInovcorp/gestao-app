@@ -92,6 +92,7 @@ Route::middleware(['auth', '2fa.required'])->group(function () {
     Route::resource('supplier-orders', SupplierOrderController::class)->only(['index', 'show']);
 
     Route::resource('supplier-invoices', SupplierInvoiceController::class);
+    Route::post('/supplier-invoices/{supplierInvoice}', [SupplierInvoiceController::class, 'update'])->name('supplier-invoices.update.post');
     Route::get('/supplier-invoices/{supplierInvoice}/download-document', [SupplierInvoiceController::class, 'downloadDocument'])->name('supplier-invoices.download-document');
     Route::get('/supplier-invoices/{supplierInvoice}/download-payment-proof', [SupplierInvoiceController::class, 'downloadPaymentProof'])->name('supplier-invoices.download-payment-proof');
 

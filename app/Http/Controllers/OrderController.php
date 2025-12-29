@@ -171,6 +171,7 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $data = [
             'client_id' => $request->client_id,
+            'validity' => $request->validity,
             'status' => $request->status,
         ];
 

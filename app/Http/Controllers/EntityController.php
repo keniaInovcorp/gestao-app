@@ -260,37 +260,4 @@ class EntityController extends Controller
         return response()->json($result);
     }
 
-    /**
-     * Log activity with device and IP address.
-     *
-     * @param Entity $entity
-     * @param string $action
-     * @param string $menuName
-     * @param Request $request
-     * @return void
-     */
-    private function logActivity(Entity $entity, string $action, string $menuName, Request $request): void
-    {
-        $user = Auth::user();
-        $device = $request->userAgent();
-        $ipAddress = $request->ip();
-
-        $description = ucfirst($action) . ' ' . $menuName . ' ' . $entity->name;
-
-        $activity = activity()
-            ->performedOn($entity)
-            ->causedBy($user)
-            ->withProperties([
-                'device' => $device,
-                'ip_address' => $ipAddress,
-            ])
-            ->log($description);
-
-        DB::table('activity_log')
-            ->where('id', $activity->id)
-            ->update([
-                'device' => $device,
-                'ip_address' => $ipAddress,
-            ]);
-    }
 }

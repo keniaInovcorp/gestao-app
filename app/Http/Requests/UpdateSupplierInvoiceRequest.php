@@ -25,11 +25,17 @@ class UpdateSupplierInvoiceRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'status' => ['required', 'in:pending,paid'],
-            'payment_proof' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'send_payment_proof' => ['nullable'],
         ];
+
+        // Only validate payment_proof if it's actually present in the request
+        if ($this->hasFile('payment_proof')) {
+            $rules['payment_proof'] = ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'];
+        }
+
+        return $rules;
     }
     
     /**
@@ -42,7 +48,7 @@ class UpdateSupplierInvoiceRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $supplierInvoice = $this->route('supplierInvoice');
-            if ($this->input('status') === 'paid' && !$this->hasFile('payment_proof') && !$supplierInvoice->payment_proof) {
+            if ($this->input('status') === 'paid' && !$this->hasFile('payment_proof') && (!$supplierInvoice || !$supplierInvoice->payment_proof)) {
                 $validator->errors()->add('payment_proof', 'Para marcar a fatura como "Paga", é necessário fazer upload do comprovativo de pagamento.');
             }
         });
