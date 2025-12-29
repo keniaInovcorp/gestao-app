@@ -23,4 +23,14 @@ abstract class Controller
             abort(403, 'Acesso negado. Não tem permissão para esta ação.');
         }
     }
+
+    protected function checkAdmin(): void
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        
+        if (!$user || !$user->hasRole('admin')) {
+            abort(403, 'Acesso negado. Apenas administradores podem aceder a esta área.');
+        }
+    }
 }

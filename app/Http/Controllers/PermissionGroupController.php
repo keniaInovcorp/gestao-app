@@ -21,7 +21,7 @@ class PermissionGroupController extends Controller
      */
     public function index(): Response
     {
-        $this->checkPermission('permission-groups.read');
+        $this->checkAdmin();
 
         $permissionGroups = Role::whereNotIn('name', ['admin', 'regular'])
             ->where('guard_name', 'web')
@@ -49,7 +49,7 @@ class PermissionGroupController extends Controller
      */
     public function create(): Response
     {
-        $this->checkPermission('permission-groups.create');
+        $this->checkAdmin();
 
         $menus = $this->getMenus();
         $permissions = Permission::where('guard_name', 'web')
@@ -74,7 +74,7 @@ class PermissionGroupController extends Controller
      */
     public function store(StorePermissionGroupRequest $request): RedirectResponse
     {
-        $this->checkPermission('permission-groups.create');
+        $this->checkAdmin();
 
         $role = Role::create([
             'name' => $request->name,
@@ -116,7 +116,7 @@ class PermissionGroupController extends Controller
      */
     public function show(Role $permissionGroup): Response
     {
-        $this->checkPermission('permission-groups.read');
+        $this->checkAdmin();
 
         if (in_array($permissionGroup->name, ['admin', 'regular'])) {
             abort(403, 'Não pode visualizar grupos de sistema.');
@@ -143,7 +143,7 @@ class PermissionGroupController extends Controller
      */
     public function edit(Role $permissionGroup): Response
     {
-        $this->checkPermission('permission-groups.update');
+        $this->checkAdmin();
 
         if (in_array($permissionGroup->name, ['admin', 'regular'])) {
             abort(403, 'Não pode editar grupos de sistema.');
@@ -182,7 +182,7 @@ class PermissionGroupController extends Controller
      */
     public function update(UpdatePermissionGroupRequest $request, Role $permissionGroup): RedirectResponse
     {
-        $this->checkPermission('permission-groups.update');
+        $this->checkAdmin();
 
         if (in_array($permissionGroup->name, ['admin', 'regular'])) {
             abort(403, 'Não pode editar grupos de sistema.');
@@ -223,7 +223,7 @@ class PermissionGroupController extends Controller
      */
     public function destroy($permissionGroup): RedirectResponse
     {
-        $this->checkPermission('permission-groups.delete');
+        $this->checkAdmin();
 
         if (is_numeric($permissionGroup)) {
             $permissionGroup = Role::findOrFail($permissionGroup);
@@ -269,8 +269,6 @@ class PermissionGroupController extends Controller
             'calendar-types' => 'Calendário - Tipos',
             'calendar-actions' => 'Calendário - Acções',
             'users' => 'Utilizadores',
-            'permission-groups' => 'Permissões',
-            'logs' => 'Logs',
         ];
     }
 }

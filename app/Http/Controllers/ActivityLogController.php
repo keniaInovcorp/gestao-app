@@ -17,7 +17,7 @@ class ActivityLogController extends Controller
      */
     public function index(Request $request)
     {
-        $this->checkPermission('logs.read');
+        $this->checkAdmin();
 
         $logs = Activity::with(['causer.roles'])
             ->orderBy('created_at', 'desc')

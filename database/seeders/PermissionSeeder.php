@@ -22,8 +22,6 @@ class PermissionSeeder extends Seeder
             'calendar-actions',
             'calendar-events',
             'users',
-            'permission-groups',
-            'logs',
         ];
 
         $actions = ['create', 'read', 'update', 'delete'];
