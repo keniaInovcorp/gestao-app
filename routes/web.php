@@ -40,15 +40,12 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', '2fa.required'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
-        ->middleware(Features::enabled(Features::twoFactorAuthentication()) ? '2fa' : null);
 
     Route::resource('countries', CountryController::class);
     Route::resource('contact-functions', ContactFunctionController::class);

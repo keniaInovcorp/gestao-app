@@ -14,7 +14,11 @@ use Spatie\Permission\Models\Role;
 
 class PermissionGroupController extends Controller
 {
-
+    /**
+     * Display a listing of the permission groups.
+     *
+     * @return Response
+     */
     public function index(): Response
     {
         $this->checkPermission('permission-groups.read');
@@ -38,6 +42,11 @@ class PermissionGroupController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for creating a new permission group.
+     *
+     * @return Response
+     */
     public function create(): Response
     {
         $this->checkPermission('permission-groups.create');
@@ -57,6 +66,12 @@ class PermissionGroupController extends Controller
         ]);
     }
 
+    /**
+     * Store a newly created permission group in storage.
+     *
+     * @param StorePermissionGroupRequest $request
+     * @return RedirectResponse
+     */
     public function store(StorePermissionGroupRequest $request): RedirectResponse
     {
         $this->checkPermission('permission-groups.create');
@@ -93,6 +108,12 @@ class PermissionGroupController extends Controller
             ->with('success', 'Grupo de permissões criado com sucesso.');
     }
 
+    /**
+     * Display the specified permission group.
+     *
+     * @param Role $permissionGroup
+     * @return Response
+     */
     public function show(Role $permissionGroup): Response
     {
         $this->checkPermission('permission-groups.read');
@@ -114,6 +135,12 @@ class PermissionGroupController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for editing the specified permission group.
+     *
+     * @param Role $permissionGroup
+     * @return Response
+     */
     public function edit(Role $permissionGroup): Response
     {
         $this->checkPermission('permission-groups.update');
@@ -146,6 +173,13 @@ class PermissionGroupController extends Controller
         ]);
     }
 
+    /**
+     * Update the specified permission group in storage.
+     *
+     * @param UpdatePermissionGroupRequest $request
+     * @param Role $permissionGroup
+     * @return RedirectResponse
+     */
     public function update(UpdatePermissionGroupRequest $request, Role $permissionGroup): RedirectResponse
     {
         $this->checkPermission('permission-groups.update');
@@ -181,6 +215,12 @@ class PermissionGroupController extends Controller
             ->with('success', 'Grupo de permissões atualizado com sucesso.');
     }
 
+    /**
+     * Remove the specified permission group from storage.
+     *
+     * @param mixed $permissionGroup
+     * @return RedirectResponse
+     */
     public function destroy($permissionGroup): RedirectResponse
     {
         $this->checkPermission('permission-groups.delete');
@@ -209,6 +249,11 @@ class PermissionGroupController extends Controller
             ->with('success', 'Grupo de permissões eliminado com sucesso.');
     }
 
+    /**
+     * Get the list of menus with their Portuguese translations.
+     *
+     * @return array
+     */
     private function getMenus(): array
     {
         return [

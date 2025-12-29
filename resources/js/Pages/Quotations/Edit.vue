@@ -38,6 +38,7 @@
                                     <Input
                                         v-bind="componentField"
                                         type="date"
+                                        @update:model-value="handleQuotationDateChange"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -328,6 +329,15 @@ const handleClientChange = (value) => {
         inertiaForm.quotation_date = today.toISOString().split('T')[0];
         
         const validityDate = new Date(today);
+        validityDate.setDate(validityDate.getDate() + 30);
+        inertiaForm.validity = validityDate.toISOString().split('T')[0];
+    }
+};
+
+const handleQuotationDateChange = (value) => {
+    if (value) {
+        const quotationDate = new Date(value);
+        const validityDate = new Date(quotationDate);
         validityDate.setDate(validityDate.getDate() + 30);
         inertiaForm.validity = validityDate.toISOString().split('T')[0];
     }

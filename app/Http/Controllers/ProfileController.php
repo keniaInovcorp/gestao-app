@@ -12,6 +12,11 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    /**
+     * Show the form for editing the user profile.
+     *
+     * @return Response
+     */
     public function edit(): Response
     {
         $user = Auth::user();
@@ -23,9 +28,17 @@ class ProfileController extends Controller
                 'email' => $user->email,
                 'mobile' => $user->mobile,
             ],
+            'twoFactorEnabled' => !is_null($user->two_factor_confirmed_at),
         ]);
     }
 
+    /**
+     * Update the user's profile information.
+     *
+     * @param Request $request
+     * @param UpdateUserProfileInformation $updater
+     * @return RedirectResponse
+     */
     public function updateProfile(Request $request, UpdateUserProfileInformation $updater): RedirectResponse
     {
         $user = Auth::user();
@@ -42,6 +55,13 @@ class ProfileController extends Controller
         }
     }
 
+    /**
+     * Update the user's password.
+     *
+     * @param Request $request
+     * @param UpdateUserPassword $updater
+     * @return RedirectResponse
+     */
     public function updatePassword(Request $request, UpdateUserPassword $updater): RedirectResponse
     {
         $user = Auth::user();

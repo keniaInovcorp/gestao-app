@@ -165,11 +165,19 @@ class OrderController extends Controller
     {
         $this->checkPermission('orders.update');
 
-        $order->update([
-            'order_date' => $request->order_date,
+        $oldStatus = $order->status;
+        $data = [
             'client_id' => $request->client_id,
             'status' => $request->status,
-        ]);
+        ];
+
+        if ($oldStatus !== 'closed' && $request->status === 'closed') {
+            $data['order_date'] = Carbon::now();
+        } else {
+            $data['order_date'] = $request->order_date;
+        }
+
+        $order->update($data);
 
         $order->lines()->delete();
 

@@ -163,12 +163,20 @@ class QuotationController extends Controller
     {
         $this->checkPermission('quotations.update');
 
-        $quotation->update([
-            'quotation_date' => $request->quotation_date,
+        $oldStatus = $quotation->status;
+        $data = [
             'client_id' => $request->client_id,
             'validity' => $request->validity,
             'status' => $request->status,
-        ]);
+        ];
+
+        if ($oldStatus !== 'closed' && $request->status === 'closed') {
+            $data['quotation_date'] = Carbon::now();
+        } else {
+            $data['quotation_date'] = $request->quotation_date;
+        }
+
+        $quotation->update($data);
 
         $quotation->lines()->delete();
 

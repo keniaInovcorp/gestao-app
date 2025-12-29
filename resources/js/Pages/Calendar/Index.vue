@@ -92,6 +92,12 @@ const calendarOptions = computed(() => ({
     plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
     initialView: 'dayGridMonth',
     locale: 'pt',
+    buttonText: {
+        today: 'Hoje',
+        month: 'Mês',
+        week: 'Semana',
+        day: 'Dia',
+    },
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',

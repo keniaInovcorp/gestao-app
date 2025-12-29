@@ -40,8 +40,13 @@ class SupplierInvoicePaymentProof extends Mailable
      */
     public function content(): Content
     {
+        $company = \App\Models\Company::first();
+        
         return new Content(
             view: 'emails.supplier-invoice-payment-proof',
+            with: [
+                'company' => $company,
+            ],
         );
     }
 
