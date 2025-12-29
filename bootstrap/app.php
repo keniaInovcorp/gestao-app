@@ -15,6 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
         
+        // Force HTTPS only in production
+        if (env('APP_ENV') === 'production') {
+            $middleware->web(prepend: [
+                \App\Http\Middleware\ForceHttps::class,
+            ]);
+        }
+        
         $middleware->alias([
             '2fa.required' => \App\Http\Middleware\RequireTwoFactorAuthentication::class,
         ]);
